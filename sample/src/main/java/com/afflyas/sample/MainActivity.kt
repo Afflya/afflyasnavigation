@@ -58,33 +58,33 @@ class MainActivity : AppCompatActivity() {
 
         bottomNavigation.setNotification("!", 1)
 
-        floating_action_button.setOnClickListener({view ->
+        floating_action_button.setOnClickListener({
             Snackbar.make(coordinator, "Hello", Snackbar.LENGTH_INDEFINITE)
                     .setAction("Ok", {  })
                     .show();
         })
 
         coloredSwitch.setOnCheckedChangeListener({
-            buttonView, isChecked -> bottomNavigation.setColored(isChecked)
+            _, isChecked -> bottomNavigation.setColored(isChecked)
         })
 
         enableTopBarScrollSwitch.setOnCheckedChangeListener({
-            buttonView, isChecked -> app_bar.behaviorTranslationEnabled = isChecked
+            _, isChecked -> app_bar.behaviorTranslationEnabled = isChecked
         })
 
         enableBotNavScrollSwitch.setOnCheckedChangeListener({
-            buttonView, isChecked -> bottomNavigation.setBehaviorTranslationEnabled(isChecked)
+            _, isChecked -> bottomNavigation.setBehaviorTranslationEnabled(isChecked)
         })
 
-        defaultTitle.setOnCheckedChangeListener { buttonView, isChecked ->
+        defaultTitle.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked)bottomNavigation.setTitleState(ANBottomNavigation.TitleState.SHOW_WHEN_ACTIVE)
         }
 
-        showTitle.setOnCheckedChangeListener { buttonView, isChecked ->
+        showTitle.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked)bottomNavigation.setTitleState(ANBottomNavigation.TitleState.ALWAYS_SHOW)
         }
 
-        noTitle.setOnCheckedChangeListener { buttonView, isChecked ->
+        noTitle.setOnCheckedChangeListener { _, isChecked ->
             if(isChecked)bottomNavigation.setTitleState(ANBottomNavigation.TitleState.ALWAYS_HIDE)
         }
 
