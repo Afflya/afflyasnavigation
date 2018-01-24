@@ -1,0 +1,62 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.dokka-android'
+
+ext {
+    bintrayRepo = 'afflyasnavigation'
+    bintrayName = 'afflyasnavigation-kotlin'
+
+    publishedGroupId = 'com.github.afflya'
+    libraryName = 'AfflyasNavigation'
+    artifact = 'afflyasnavigation-kotlin'
+
+    libraryDescription = 'Kotlin Android library for implementing the behavior of navigation elements upon content scrolling'
+
+    siteUrl = 'https://github.com/Afflya/afflyasnavigation'
+    gitUrl = 'https://github.com/Afflya/afflyasnavigation.git'
+
+    libraryVersion = '1.0.0'
+
+    developerId = 'afflya'
+    developerName = 'Andrey Poznyakov'
+    developerEmail = 'afflyas.view@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
+
+android {
+    compileSdkVersion 27
+
+    defaultConfig {
+        minSdkVersion 14
+        targetSdkVersion 27
+        versionCode 1
+        versionName "1.0.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation "com.android.support:design:27.0.2"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:1.2.21"
+}
+
+
+
+dokka {
+    outputFormat = 'html'
+    outputDirectory = "$buildDir/javadoc"
+}
+
+// Place it at the end of the file
+apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+apply from: 'bintrayv1.gradle'

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ANTopBar_Params">
+        <attr name="tbBehaviorTranslationEnabled" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ANBottomNavigationBehavior_Params">
+        <attr name="selectedBackgroundVisible" format="boolean" />
+        <attr name="colored" format="boolean" />
+        <attr name="accentColor" format="color" />
+        <attr name="inactiveColor" format="color" />
+        <attr name="disableColor" format="color" />
+        <attr name="coloredActive" format="color" />
+        <attr name="coloredInactive" format="color" />
+    </declare-styleable>
+
+</resources>
