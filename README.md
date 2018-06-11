@@ -8,7 +8,7 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 
 <img src="include/Sample-1.gif" width="208" height="368" /> <img src="include/Sample-2.gif" width="208" height="368" /> <img src="include/Sample-3.gif" width="208" height="368" /> <img src="include/Sample-4.gif" width="208" height="368" /> 
 
-## What's new in 1.0.1 ([Changelog](https://github.com/Afflya/afflyasnavigation/master/ChangeLog.md))
+## What's new in 1.0.1 ([Changelog](https://github.com/Afflya/afflyasnavigation/master/Changelog.md))
 
 * Updated libraries versions
 * Optimized screen bounds calculation algorithm
