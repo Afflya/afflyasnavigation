@@ -45,6 +45,30 @@ object ANHelper {
     }
 
     /**
+     *
+     * Check if device has navigation bar
+     *
+     */
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    fun hasNavigationBar(context: Context): Boolean {
+        val d = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
+
+        val realDisplayMetrics = DisplayMetrics()
+        d.getRealMetrics(realDisplayMetrics)
+
+        val realHeight = realDisplayMetrics.heightPixels
+        val realWidth = realDisplayMetrics.widthPixels
+
+        val displayMetrics = DisplayMetrics()
+        d.getMetrics(displayMetrics)
+
+        val displayHeight = displayMetrics.heightPixels
+        val displayWidth = displayMetrics.widthPixels
+
+        return realWidth > displayWidth || realHeight > displayHeight
+    }
+
+    /**
      * Check if translucent navigation enabled in the theme
      */
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

@@ -4,44 +4,45 @@
 
 AfflyasNavigation is an Android library for implementing the behavior of navigation components upon content scrolling
 
-## Configuration
-
-* compileSdkVersion=27
-* minSdkVersion=14
-* targetSdkVersion=27
-* supportVersion=27.0.2
-* kotlinVersion=1.2.21
-
 ## Sample
 
 <img src="include/Sample-1.gif" width="208" height="368" /> <img src="include/Sample-2.gif" width="208" height="368" /> <img src="include/Sample-3.gif" width="208" height="368" /> <img src="include/Sample-4.gif" width="208" height="368" /> 
+
+## What's new in 1.0.1 ([Changelog](https://github.com/Afflya/afflyasnavigation/master/ChangeLog.md))
+
+* Updated libraries versions
+* Optimized screen bounds calculation algorithm
+
+## Configuration
+
+- compileSdkVersion=27
+- minSdkVersion=14
+- targetSdkVersion=27
+- supportVersion=27.1.1
+- kotlinVersion=1.2.41
 
 ## Components
 
 ### ANTopBar
 
 * Container for the content displayed at the top of the screen such as `Toolbar`
-* Can appear and disappear dynamically upon scrolling synchronously within ANBottomNavigation
+* Appear and disappear upon scrolling synchronously within `ANBottomNavigation`
 * Top padding depends on the availability of transparent navigation, as well as the position of the window in multi-window mode
 
 ### ANBottomNavigation
 
-* Based on [AHBottomNavigation (v2.1.0)](https://github.com/aurelhubert/ahbottomnavigation) by [Aurelien Hubert](https://github.com/aurelhubert)
-  * Follow the [bottom navigation guidelines](https://www.google.com/design/spec/components/bottom-navigation.html) from Material Design
-  * Add 3 to 5 items (with title, icon & color)
-  * Choose your style: Classic or colored navigation
-  * Add a OnTabSelectedListener to detect tab selection
-  * Support icon font color with `setForceTint(true)`
-  * Manage notififcations for each item
-  * Enable/disable tab state
+* Folllowing the [bottom navigation guidelines](https://www.google.com/design/spec/components/bottom-navigation.html) from Material Design
+* Add 3 to 5 items (with title, icon & color)
+* 3 different navigation styles
+* Manage notififcations for each item
 * Adapted to multi-window mode
-* Adapted to side translucent navigation in landscape orientation
-* Fixed Snackbar behavior
+* Adapted to translucent navigation
+* Proper Snackbar behavior
 
 ### ANFloatingActionButton
 
-* Attaches to top of ANBottomNavigation
-* Moves up when Snackbar appears
+* Attaches to top of `ANBottomNavigation`
+* Moves up when `Snackbar` appears
 * Always above translucent navigation bar
 * Adapted to side translucent navigation in landscape orientation
 
@@ -49,10 +50,10 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 
 ### Installation
 
-Add the following to your `build.gradle`'s dependencies section:
+Add the following line to your `build.gradle`'s dependencies section:
 
 ```groovy
-implementation 'com.github.afflya:afflyasnavigation-kotlin:1.0.0'
+implementation 'com.github.afflya:afflyasnavigation-kotlin:1.0.1'
 ```
 
 * The library is completely written in [Kotlin](https://kotlinlang.org) but will work if you use java
@@ -204,9 +205,9 @@ The elements automatically adapt to transparent bars, you just need to include t
 
 ## Current tasks
 
-* Manage ANFloatingActionButton translation behavior for Gravity.TOP(move to top) and Gravity.CENTER_VERTICAL(do not move)
-* Manage bottom translation for large screens (when little snackbar appears in the middle)
-* Implement a library in Java
+* Upgrade ANFloatingActionButton translation behavior for Gravity.TOP (move FAB to top) and Gravity.CENTER_VERTICAL (do not move)
+* Add bottom translation for large screens (when little snackbar appears in the middle)
+* Add content container component
 
 ## License
 

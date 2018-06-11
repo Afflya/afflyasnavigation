@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="ANTopBar_Params">
-        <attr name="tbBehaviorTranslationEnabled" format="boolean" />
+    <declare-styleable name="ANTopBar">
+        <attr name="ANTopBar_BehaviorTranslationEnabled" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="ANBottomNavigationBehavior_Params">

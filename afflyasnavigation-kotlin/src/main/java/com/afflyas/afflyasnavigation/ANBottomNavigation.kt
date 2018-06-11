@@ -1,12 +1,10 @@
 package com.afflyas.afflyasnavigation
 
 import android.animation.Animator
-import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Canvas
 import android.graphics.Color
-import android.graphics.Rect
 import android.graphics.Typeface
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -15,16 +13,15 @@ import android.os.Parcelable
 import android.support.annotation.ColorInt
 import android.support.annotation.ColorRes
 import android.support.annotation.DrawableRes
+import android.support.annotation.RequiresApi
 import android.support.design.widget.CoordinatorLayout
 import android.support.v4.content.ContextCompat
 import android.support.v4.view.ViewCompat
 import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.AttributeSet
-import android.util.DisplayMetrics
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
-import android.view.View.OnClickListener
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.FrameLayout
@@ -59,7 +56,6 @@ class ANBottomNavigation : FrameLayout {
     private var tabSelectedListener: OnTabSelectedListener? = null
 
     // Variables
-    private var androidNavigationState = AndroidNavigationState.NAV_DEFAULT
     private var translucentNavigationThemeEnabled: Boolean = false
     private val items = ArrayList<ANBottomNavigationItem>()
     private val views = ArrayList<View>()
@@ -71,13 +67,24 @@ class ANBottomNavigation : FrameLayout {
     private var selectedBackgroundVisible = false
     private var notifications: ArrayList<ANNotification>? = ANNotification.generateEmptyList(MAX_ITEMS)
     private val itemsEnabledStates = arrayOf(true, true, true, true, true)
-    private var isBehaviorTranslationSet = false
     private var currentItem = 0
     private var currentColor = 0
-    private var behaviorTranslationEnabled = true
     private var needHideBottomNavigation = false
     private var hideBottomNavigationWithAnimation = false
     private var soundEffectsEnabled = true
+
+    var behaviorTranslationEnabled = true
+        private set
+    /**
+     * indicates that insets were set
+     */
+    private var isInsetsSet = false
+    /**
+     * system window inset values that has been set as padding
+     */
+    private var insetLeft = 0
+    private var insetRight = 0
+    private var insetBottom = 0
 
     // Variables (Styles)
     private var titleTypeface: Typeface? = null
@@ -135,79 +142,183 @@ class ANBottomNavigation : FrameLayout {
         createItems()
     }
 
-    @SuppressLint("DrawAllocation")
+    /**
+     * Setup showing/hiding behavior on scrolling
+     */
+    private fun setupBehaviorTranslation(){
+        if (parent is CoordinatorLayout) {
+            if (bottomNavigationBehavior == null) {
+                bottomNavigationBehavior = ANBottomNavigationBehavior(behaviorTranslationEnabled, insetLeft, insetRight, insetBottom)
+            } else {
+                bottomNavigationBehavior!!.setBehaviorTranslationEnabled(behaviorTranslationEnabled)
+                bottomNavigationBehavior!!.setInsets(insetLeft, insetRight, insetBottom)
+            }
+
+            (layoutParams as CoordinatorLayout.LayoutParams).behavior = bottomNavigationBehavior
+
+            if (needHideBottomNavigation) {
+                needHideBottomNavigation = false
+                bottomNavigationBehavior!!.hideView(this, bottomNavigationHeight, hideBottomNavigationWithAnimation)
+            }
+        }
+    }
+
+    /**
+     * Set the behavior translation value
+     *
+     * @param behaviorTranslationEnabled boolean for the state
+     */
+    fun enableBehaviorTranslation(behaviorTranslationEnabled: Boolean) {
+        this.behaviorTranslationEnabled = behaviorTranslationEnabled
+        setupBehaviorTranslation()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private fun calcInsets(){
+        var insetLeft = 0
+        var insetRight = 0
+        var insetBottom = 0
+
+        when{
+        /**
+         * P(or later) insets with cutout support
+         * TODO uncomment these lines if your target sdk version >= 28
+         */
+//            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+//                val insets = rootView.rootWindowInsets
+//                val notch = insets.displayCutout
+//
+////                    Log.d("development", "stable insets\n" +
+////                            "systemWindowInsetTop = ${insets.stableInsetTop}\n" +
+////                            "systemWindowInsetBottom = ${insets.stableInsetBottom}\n" +
+////                            "systemWindowInsetLeft = ${insets.stableInsetLeft}\n" +
+////                            "systemWindowInsetRight = ${insets.stableInsetRight}\n" +
+////                            "")
+////                    Log.d("development", "system insets\n" +
+////                            "systemWindowInsetTop = ${insets.systemWindowInsetTop}\n" +
+////                            "systemWindowInsetBottom = ${insets.systemWindowInsetBottom}\n" +
+////                            "systemWindowInsetLeft = ${insets.systemWindowInsetLeft}\n" +
+////                            "systemWindowInsetRight = ${insets.systemWindowInsetRight}\n" +
+////                            "")
+////                    Log.d("development", "displayCutout\n" +
+////                            "systemWindowInsetTop = ${insets.displayCutout.safeInsetTop}\n" +
+////                            "systemWindowInsetBottom = ${insets.displayCutout.safeInsetBottom}\n" +
+////                            "systemWindowInsetLeft = ${insets.displayCutout.safeInsetLeft}\n" +
+////                            "systemWindowInsetRight = ${insets.displayCutout.safeInsetRight}\n" +
+////                            "")
+//
+//                if(ANHelper.isInMultiWindow(context)){
+//                    if(notch != null){
+//                        insetLeft = insets.systemWindowInsetLeft
+//                        insetRight = insets.systemWindowInsetRight
+//                        insetBottom = insets.systemWindowInsetBottom
+//                        /**
+//                         * stable insets -insets without notch
+//                         */
+//                        if(insets.stableInsetLeft != 0) insetLeft = 0
+//                        if(insets.stableInsetRight != 0) insetRight = 0
+//                        if(insets.stableInsetBottom != 0) insetBottom = 0
+//                    }
+//                }else{
+//                    if(translucentNavigationThemeEnabled){
+//                        insetBottom = insets.systemWindowInsetBottom
+//                        insetLeft = insets.systemWindowInsetLeft
+//                        insetRight = insets.systemWindowInsetRight
+//                    }else{
+//                        if(notch != null){
+//                            insetLeft = notch.safeInsetLeft
+//                            insetRight = notch.safeInsetRight
+//                            insetBottom = notch.safeInsetBottom
+//                            /**
+//                             * stable insets -insets without notch
+//                             */
+//                            if(insets.stableInsetLeft != 0) insetLeft = 0
+//                            if(insets.stableInsetRight != 0) insetRight = 0
+//                            if(insets.stableInsetBottom != 0) insetBottom = 0
+//                        }
+//                    }
+//                }
+//            }
+        /**
+         * Nougat and Oreo insets
+         */
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+                val insets = rootView.rootWindowInsets
+                if(translucentNavigationThemeEnabled && !ANHelper.isInMultiWindow(context)){
+                    insetBottom = insets.systemWindowInsetBottom
+                    insetLeft = insets.systemWindowInsetLeft
+                    insetRight = insets.systemWindowInsetRight
+                }
+            }
+        /**
+         * Marshmallow insets
+         */
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+                val insets = rootView.rootWindowInsets
+                if(translucentNavigationThemeEnabled){
+                    insetBottom = insets.systemWindowInsetBottom
+                    insetLeft = insets.systemWindowInsetLeft
+                    insetRight = insets.systemWindowInsetRight
+                }
+            }
+        /**
+         * Lollipop insets
+         */
+            else -> {
+                if(translucentNavigationThemeEnabled && ANHelper.hasNavigationBar(context)){
+                    if(resources.configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)){
+                        insetBottom = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
+                    }else{
+                        if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE){
+                            insetRight = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
+                        }else{
+                            insetBottom = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
+                        }
+                    }
+                }
+            }
+        }
+        /**
+         * Check if these values are already set
+         */
+        if(insetLeft != this.insetLeft || insetRight != this.insetRight || insetBottom != this.insetBottom){
+            this.insetLeft = insetLeft
+            this.insetRight = insetRight
+            this.insetBottom = insetBottom
+
+            //createItems()
+            isInsetsSet = false
+        }
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            calcInsets()
+        }else{
+            /**
+             * display bottom bar above other elements for Kitkat and older
+             */
+            bringToFront()
+        }
+    }
 
-        if (!isBehaviorTranslationSet) {
-            //The translation behavior has to be set up after the super.onMeasure has been called.
-            setBehaviorTranslationEnabled(behaviorTranslationEnabled)
-            isBehaviorTranslationSet = true
+    override fun onDraw(canvas: Canvas?) {
+        if(!isInsetsSet){
+            isInsetsSet = true
+
+            createItems()
+
+            setupBehaviorTranslation()
+
             if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
                 bringToFront()
             }
         }
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            val rect = Rect()
-            getWindowVisibleDisplayFrame(rect)
-
-            if(rect.width() != 0){
-                val requiredAndroidNavigationState: AndroidNavigationState
-                if(translucentNavigationThemeEnabled){
-                    /**
-                     * Detecting translucent navigation placement
-                     */
-                    val d = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-                    val realDisplayMetrics = DisplayMetrics()
-                    d.getRealMetrics(realDisplayMetrics)
-                    val realHeight = realDisplayMetrics.heightPixels
-                    val realWidth = realDisplayMetrics.widthPixels
-                    /**
-                     * No translucent nav in multi-window
-                     */
-                    if((Build.VERSION.SDK_INT < Build.VERSION_CODES.N || !ANHelper.isInMultiWindow(context))) {
-                        /**
-                         * No side translucent nav on tablet
-                         */
-                        if(resources.configuration.isLayoutSizeAtLeast(Configuration.SCREENLAYOUT_SIZE_LARGE)){
-                            /**
-                             * is there translucent navigation
-                             */
-                            if(rect.bottom >= realHeight){
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_DEFAULT
-                            }else{
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM
-                            }
-                        }else{
-                            //check left side
-                            if(rect.left != 0){
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_TRANSLUCENT_LEFT
-                                //check right side
-                            }else if(rect.right != realWidth){
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_TRANSLUCENT_RIGHT
-                                //check bottom side
-                            }else if(rect.bottom >= realHeight){
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_DEFAULT
-                            }else{
-                                requiredAndroidNavigationState = AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM
-                            }
-                        }
-                    }else{
-                        requiredAndroidNavigationState = AndroidNavigationState.NAV_DEFAULT
-                    }
-                }else{
-                    requiredAndroidNavigationState = AndroidNavigationState.NAV_DEFAULT
-                }
-
-                if(androidNavigationState != requiredAndroidNavigationState){
-                    androidNavigationState = requiredAndroidNavigationState
-                    bottomNavigationBehavior?.androidNavigationState = requiredAndroidNavigationState
-                    createItems()
-                }
-            }
-        }
+        super.onDraw(canvas)
     }
+
+
 
     override fun onSaveInstanceState(): Parcelable? {
         val bundle = Bundle()
@@ -222,6 +333,7 @@ class ANBottomNavigation : FrameLayout {
         if (state is Bundle) {
             val bundle = state as Bundle?
             currentItem = bundle!!.getInt("current_item")
+
             notifications = bundle.getParcelableArrayList<ANNotification>("notifications")
             state = bundle.getParcelable("superState")
         }
@@ -302,20 +414,22 @@ class ANBottomNavigation : FrameLayout {
      * Create the items in the bottom navigation
      */
     private fun createItems() {
+
         if (items.size < MIN_ITEMS) {
             Log.w(TAG, "The items list should have at least 3 items")
         } else if (items.size > MAX_ITEMS) {
             Log.w(TAG, "The items list should not have more than 5 items")
         }
 
-        val layoutHeight = resources.getDimension(R.dimen.bottom_navigation_height).toInt()
-
         removeAllViews()
         views.clear()
+
+        val layoutHeight = resources.getDimension(R.dimen.bottom_navigation_height).toInt()
+
         backgroundColorView = View(context)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             val backgroundLayoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, calculateHeight(layoutHeight))
+                    ViewGroup.LayoutParams.MATCH_PARENT, layoutHeight + insetBottom)
             addView(backgroundColorView, backgroundLayoutParams)
             bottomNavigationHeight = layoutHeight
         }
@@ -324,13 +438,7 @@ class ANBottomNavigation : FrameLayout {
         linearLayoutContainer!!.orientation = LinearLayout.HORIZONTAL
         linearLayoutContainer!!.gravity = Gravity.CENTER
 
-
-        if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_LEFT){
-            linearLayoutContainer!!.setPadding(resources.getDimensionPixelOffset(R.dimen.navigation_bar_height),0,0,0)
-        }else if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_RIGHT){
-            linearLayoutContainer!!.setPadding(0,0, resources.getDimensionPixelOffset(R.dimen.navigation_bar_height),0)
-        }
-
+        linearLayoutContainer!!.setPadding(insetLeft,0,insetRight,0)
 
         val layoutParams = FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, layoutHeight)
 
@@ -344,23 +452,6 @@ class ANBottomNavigation : FrameLayout {
 
         // Force a request layout after all the items have been created
         post { requestLayout() }
-    }
-
-    @SuppressLint("NewApi")
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    private fun calculateHeight(inputLayoutHeight: Int): Int {
-        var layoutHeight = inputLayoutHeight
-
-        if (androidNavigationState != AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM) return layoutHeight
-
-        val resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android")
-        if (resourceId > 0) {
-            navigationBarHeight = resources.getDimensionPixelSize(resourceId)
-        }
-
-        layoutHeight += navigationBarHeight
-
-        return layoutHeight
     }
 
     /**
@@ -478,7 +569,7 @@ class ANBottomNavigation : FrameLayout {
                 icon.setImageDrawable(ANHelper.getTintDrawable(items[i].getDrawable(context)!!,
                         if (current) itemActiveColor else itemInactiveColor, forceTint))
                 title.setTextColor(if (current) itemActiveColor else itemInactiveColor)
-                view.setSoundEffectsEnabled(soundEffectsEnabled)
+                view.isSoundEffectsEnabled = soundEffectsEnabled
             } else {
                 icon.setImageDrawable(ANHelper.getTintDrawable(items[i].getDrawable(context)!!,
                         itemDisableColor, forceTint))
@@ -539,7 +630,7 @@ class ANBottomNavigation : FrameLayout {
             icon.setImageDrawable(item.getDrawable(context))
 
             if (titleState != TitleState.ALWAYS_HIDE) {
-                title.setText(item.getTitle(context))
+                title.text = item.getTitle(context)
             }
 
             if (titleActiveTextSize != 0f) {
@@ -594,8 +685,8 @@ class ANBottomNavigation : FrameLayout {
                         if (currentItem == i) itemActiveColor else itemInactiveColor, forceTint))
                 title.setTextColor(if (currentItem == i) itemActiveColor else itemInactiveColor)
                 title.alpha = (if (currentItem == i) 1 else 0).toFloat()
-                view.setOnClickListener(OnClickListener { updateSmallItems(i, true) })
-                view.setSoundEffectsEnabled(soundEffectsEnabled)
+                view.setOnClickListener({ updateSmallItems(i, true) })
+                view.isSoundEffectsEnabled = soundEffectsEnabled
             } else {
                 icon.setImageDrawable(ANHelper.getTintDrawable(items[i].getDrawable(context)!!,
                         itemDisableColor, forceTint))
@@ -678,6 +769,7 @@ class ANBottomNavigation : FrameLayout {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && colored) {
 
                     val finalRadius = Math.max(width, height)
+//                    val finalRadius = Math.max(realWidth, realHeight)
                     val cx = view.x.toInt() + view.width / 2
                     val cy = view.height / 2
 
@@ -689,6 +781,7 @@ class ANBottomNavigation : FrameLayout {
 
                     circleRevealAnim = ViewAnimationUtils.createCircularReveal(backgroundColorView, cx, cy, 0f, finalRadius.toFloat())
                     circleRevealAnim!!.startDelay = 5
+
                     circleRevealAnim!!.addListener(object : Animator.AnimatorListener {
                         override fun onAnimationStart(animation: Animator) {
                             backgroundColorView!!.setBackgroundColor(items[itemIndex].getColor(context))
@@ -703,6 +796,8 @@ class ANBottomNavigation : FrameLayout {
 
                         override fun onAnimationRepeat(animation: Animator) {}
                     })
+
+
                     circleRevealAnim!!.start()
                 } else if (colored) {
                     ANHelper.updateViewBackgroundColor(this, currentColor,
@@ -1207,37 +1302,6 @@ class ANBottomNavigation : FrameLayout {
     }
 
     /**
-     * Return if the behavior translation is enabled
-     *
-     * @return a boolean value
-     */
-    fun isBehaviorTranslationEnabled(): Boolean {
-        return behaviorTranslationEnabled
-    }
-
-    /**
-     * Set the behavior translation value
-     *
-     * @param behaviorTranslationEnabled boolean for the state
-     */
-    fun setBehaviorTranslationEnabled(behaviorTranslationEnabled: Boolean) {
-        this.behaviorTranslationEnabled = behaviorTranslationEnabled
-        if (parent is CoordinatorLayout) {
-            val params = layoutParams
-            if (bottomNavigationBehavior == null) {
-                bottomNavigationBehavior = ANBottomNavigationBehavior<ANBottomNavigation>(context, behaviorTranslationEnabled, androidNavigationState)
-            } else {
-                bottomNavigationBehavior!!.setBehaviorTranslationEnabled(behaviorTranslationEnabled)
-            }
-            (params as CoordinatorLayout.LayoutParams).behavior = bottomNavigationBehavior
-            if (needHideBottomNavigation) {
-                needHideBottomNavigation = false
-                bottomNavigationBehavior!!.hideView(this, bottomNavigationHeight, hideBottomNavigationWithAnimation)
-            }
-        }
-    }
-
-    /**
      * Hide Bottom Navigation with animation
      */
     fun hideBottomNavigation() {
@@ -1251,12 +1315,7 @@ class ANBottomNavigation : FrameLayout {
      */
     fun hideBottomNavigation(withAnimation: Boolean) {
         if (bottomNavigationBehavior != null) {
-            if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM){
-                bottomNavigationBehavior!!.hideView(this, bottomNavigationHeight + navigationBarHeight, withAnimation)
-            }else{
-                bottomNavigationBehavior!!.hideView(this, bottomNavigationHeight, withAnimation)
-            }
-
+            bottomNavigationBehavior!!.hideView(this, bottomNavigationHeight + insetBottom, withAnimation)
         } else if (parent is CoordinatorLayout) {
             needHideBottomNavigation = true
             hideBottomNavigationWithAnimation = withAnimation

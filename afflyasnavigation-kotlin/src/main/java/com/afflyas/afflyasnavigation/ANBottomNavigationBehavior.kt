@@ -1,7 +1,6 @@
 package com.afflyas.afflyasnavigation
 
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.os.Build
 import android.support.design.widget.CoordinatorLayout
 import android.support.design.widget.Snackbar
@@ -10,12 +9,13 @@ import android.support.v4.view.ViewPropertyAnimatorCompat
 import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.view.View
 import android.view.ViewGroup
+import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 
 class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     companion object {
         private val INTERPOLATOR = LinearOutSlowInInterpolator()
-        private val ANIM_DURATION = 300
+        private const val ANIM_DURATION = 300
     }
     /**
      * Is hidden
@@ -27,24 +27,45 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
     private var translationObjectAnimator: ObjectAnimator? = null
     private var snackbarLayout: Snackbar.SnackbarLayout? = null
     private var targetOffset = 0f
-    private var behaviorTranslationEnabled = true
 
-    private var translucentNavigationHeight: Int = 0
+    private var behaviorTranslationEnabled = false
 
-    var androidNavigationState = AndroidNavigationState.NAV_DEFAULT
+    /**
+     * system window inset values that has been set as padding
+     */
+    private var insetLeft = 0
+    private var insetRight = 0
+    private var insetBottom = 0
 
-    constructor(context: Context): super() {
-        translucentNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
-    }
+    constructor(): super()
 
-    constructor(context: Context, behaviorTranslationEnabled: Boolean, navigationState: AndroidNavigationState) : super() {
-        this.androidNavigationState = navigationState
+    constructor(behaviorTranslationEnabled: Boolean): super(){
         this.behaviorTranslationEnabled = behaviorTranslationEnabled
-        translucentNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
     }
 
-    override fun layoutDependsOn(parent: CoordinatorLayout?, child: V?, dependency: View?): Boolean {
-        if (dependency != null && dependency is Snackbar.SnackbarLayout) {
+    constructor(behaviorTranslationEnabled: Boolean, insetLeft: Int, insetRight: Int, insetBottom: Int) : super() {
+        this.behaviorTranslationEnabled = behaviorTranslationEnabled
+        this.insetLeft = insetLeft
+        this.insetRight = insetRight
+        this.insetBottom = insetBottom
+    }
+
+    fun setInsets(insetLeft: Int, insetRight: Int, insetBottom: Int){
+        this.insetLeft = insetLeft
+        this.insetRight = insetRight
+        this.insetBottom = insetBottom
+    }
+
+    /**
+     * Enable or not the behavior translation
+     * @param behaviorTranslationEnabled
+     */
+    fun setBehaviorTranslationEnabled(behaviorTranslationEnabled: Boolean) {
+        this.behaviorTranslationEnabled = behaviorTranslationEnabled
+    }
+
+    override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
+        if (dependency is Snackbar.SnackbarLayout) {
             updateSnackbar(child, dependency)
             return true
         }
@@ -120,16 +141,15 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
             translationAnimator!!.duration = (if (withAnimation) ANIM_DURATION else 0).toLong()
             translationAnimator!!.setUpdateListener {
                 if (snackbarLayout != null && snackbarLayout!!.layoutParams is ViewGroup.MarginLayoutParams) {
-                    //if(translucentNavigationHeight > 0){
-                    if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM){
-                        val newOffset = (child.measuredHeight - child.translationY - translucentNavigationHeight)
+                    targetOffset = if(insetBottom > 0){
+                        val newOffset = (child.measuredHeight - child.translationY - insetBottom)
                         if(newOffset < 0){
-                            targetOffset = 0f
+                            0f
                         } else {
-                            targetOffset = newOffset
+                            newOffset
                         }
                     }else{
-                        targetOffset = child.measuredHeight - child.translationY
+                        child.measuredHeight - child.translationY
                     }
                     val p = snackbarLayout!!.layoutParams as ViewGroup.MarginLayoutParams
                     p.bottomMargin = targetOffset.toInt()
@@ -167,16 +187,6 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
         }
     }
 
-
-
-    /**
-     * Enable or not the behavior translation
-     * @param behaviorTranslationEnabled
-     */
-    fun setBehaviorTranslationEnabled(behaviorTranslationEnabled: Boolean) {
-        this.behaviorTranslationEnabled = behaviorTranslationEnabled
-    }
-
     /**
      * Hide AHBottomNavigation with animation
      * @param view
@@ -203,30 +213,26 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
     /**
      * Update Snackbar bottom margin and left/right padding
      */
-    fun updateSnackbar(child: View?, dependency: View?) {
+    private fun updateSnackbar(child: View?, dependency: View?) {
         if (dependency != null && dependency is Snackbar.SnackbarLayout) {
 
             val targetMargin: Int
             /**
              * bottom margin
              */
-            if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM){
-                val newOffset = (child!!.measuredHeight - child.translationY - translucentNavigationHeight).toInt()
-                if(newOffset < 0){
-                    targetMargin = 0
+            if(insetBottom > 0){
+                val newOffset = (child!!.measuredHeight - child.translationY - insetBottom).toInt()
+                targetMargin = if(newOffset < 0){
+                    0
                 } else {
-                    targetMargin = newOffset
+                    newOffset
                 }
             }else{
                 targetMargin = (child!!.measuredHeight - child.translationY).toInt()
                 /**
                  * side padding for landscape translucent navigation
                  */
-                if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_LEFT){
-                    dependency.setPadding(translucentNavigationHeight, 0, 0, 0)
-                }else if(androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_RIGHT){
-                    dependency.setPadding(0, 0, translucentNavigationHeight, 0)
-                }
+                dependency.setPadding(insetLeft, 0, insetRight, 0)
             }
 
             if (dependency.layoutParams is ViewGroup.MarginLayoutParams) {
@@ -237,6 +243,4 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
             snackbarLayout = dependency
         }
     }
-
-
 }

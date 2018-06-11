@@ -14,7 +14,7 @@ abstract class VerticalScrollingBehavior<V : View> : CoordinatorLayout.Behavior<
         const val SCROLL_DIRECTION_DOWN = -1
         const val SCROLL_NONE = 0
 
-        @IntDef(SCROLL_DIRECTION_UP.toLong(), SCROLL_DIRECTION_DOWN.toLong(), SCROLL_NONE.toLong())
+        @IntDef(SCROLL_DIRECTION_UP, SCROLL_DIRECTION_DOWN, SCROLL_NONE)
         @Retention(AnnotationRetention.SOURCE)
         annotation class ScrollDirection
     }

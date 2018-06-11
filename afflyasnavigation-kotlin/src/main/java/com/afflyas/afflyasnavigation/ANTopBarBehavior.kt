@@ -10,6 +10,7 @@ import android.support.v4.view.ViewPropertyAnimatorCompat
 import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.AttributeSet
 import android.view.View
+import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 
 class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
 
@@ -21,7 +22,7 @@ class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
     private var hidden = false
     private var translationAnimator: ViewPropertyAnimatorCompat? = null
     private var translationObjectAnimator: ObjectAnimator? = null
-    var behaviorTranslationEnabled = true
+    var behaviorTranslationEnabled = false
 
     /**
      * Constructor

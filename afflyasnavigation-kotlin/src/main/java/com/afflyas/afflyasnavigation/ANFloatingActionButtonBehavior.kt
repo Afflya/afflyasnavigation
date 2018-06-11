@@ -9,22 +9,21 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
 
-class ANFloatingActionButtonBehavior<V : View>(
-        context: Context,
-        androidNavigationState: AndroidNavigationState,
-        layoutHeight: Int) : CoordinatorLayout.Behavior<V>() {
 
-    private val translucentNavigationEnabled: Boolean
+class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>() {
 
-    private val bottomNavigationHeight: Int
-    private val translucentBarHeight: Int
+    /**
+     * system window inset values that has been set as padding
+     */
+    private var insetBottom = 0
 
+    private var bottomNavigationHeight: Int = 0
     //fab margin from bottom of screen
-    private val fabMarginBottom: Int
+    private var fabMarginBottom: Int = 0
 
-    private val displayHeight: Int
+    private var displayHeight: Int = 0
     //Y coordinate of TranslucentNavigationBar's top
-    private val translucentBarY: Int
+    private var translucentBarY: Int = 0
 
     private var initNavigationPosition: Float = 0f
     private var initFABPosition: Float = 0f
@@ -38,26 +37,28 @@ class ANFloatingActionButtonBehavior<V : View>(
      */
     private var currentSnackBarPosition: Float = 0f
 
-    init {
-        bottomNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
-        translucentBarHeight = context.resources.getDimensionPixelOffset(R.dimen.navigation_bar_height)
+    var behaviorTranslationInitialized = false
+        private set
 
-        translucentNavigationEnabled = androidNavigationState == AndroidNavigationState.NAV_TRANSLUCENT_BOTTOM
+    fun updateTranslationBehavior(context: Context, insetBottom: Int, layoutHeight: Int){
+
+        this.insetBottom = insetBottom
+
+        bottomNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
 
         val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-
         val displayMetrics = DisplayMetrics()
 
         /**
          * Y coordinates calculating differently on android <= LOLLIPOP
          */
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && translucentNavigationEnabled){
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && insetBottom > 0){
             display.getRealMetrics(displayMetrics)
             displayHeight = displayMetrics.heightPixels
-            translucentBarY = displayHeight - translucentBarHeight
-            fabMarginBottom = bottomNavigationHeight + translucentBarHeight
+            translucentBarY = displayHeight - insetBottom
+            fabMarginBottom = bottomNavigationHeight + insetBottom
 
-            initFABPosition = (displayHeight - bottomNavigationHeight - translucentBarHeight - layoutHeight).toFloat()
+            initFABPosition = (displayHeight - bottomNavigationHeight - insetBottom - layoutHeight).toFloat()
             initSnackBarPosition = displayHeight.toFloat()
 
         }else{
@@ -70,34 +71,27 @@ class ANFloatingActionButtonBehavior<V : View>(
                 initFABPosition = (displayHeight - bottomNavigationHeight - layoutHeight).toFloat()
                 initSnackBarPosition = displayHeight.toFloat()
             }
-
         }
+
+        behaviorTranslationInitialized = true
     }
 
-    override fun layoutDependsOn(parent: CoordinatorLayout?, child: V?, dependency: View?): Boolean {
+    override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
+        if(behaviorTranslationInitialized){
 
-        if(dependency != null){
-
-            if(child != null){
-                if(initFABPosition == 0f && child.y != 0f){
-                    if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-                        initFABPosition = child.y
-                    }
+            if(initFABPosition == 0f && child.y != 0f){
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+                    initFABPosition = child.y - bottomNavigationHeight
                 }
             }
 
             when(dependency) {
                 is ANBottomNavigation -> {
                     if(initNavigationPosition == 0f && dependency.y != 0f){
-                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-                            if(translucentNavigationEnabled){
-                                initNavigationPosition = (displayHeight - bottomNavigationHeight - translucentBarHeight).toFloat()
-                            }else{
-                                initNavigationPosition = (displayHeight - bottomNavigationHeight).toFloat()
-                            }
+                        initNavigationPosition = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+                            (displayHeight - bottomNavigationHeight - insetBottom).toFloat()
                         }else{
-                            initNavigationPosition = dependency.y
-
+                            dependency.y
                         }
                         currentNavigationPosition = dependency.y
                     }
@@ -118,79 +112,79 @@ class ANFloatingActionButtonBehavior<V : View>(
         return super.layoutDependsOn(parent, child, dependency)
     }
 
-    override fun onDependentViewChanged(parent: CoordinatorLayout?, child: V?, dependency: View?): Boolean {
-        updateFloatingActionButton(child, dependency)
+    override fun onDependentViewChanged(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
+        if(behaviorTranslationInitialized){
+            updateFloatingActionButton(child, dependency)
+        }
         return super.onDependentViewChanged(parent, child, dependency)
     }
 
     /**
      * Update floating action button Y coordinate
      */
-    private fun updateFloatingActionButton(child: V?, dependency: View?) {
-        if(child != null && dependency != null){
-            when(dependency) {
-                is ANBottomNavigation -> {
-                    currentNavigationPosition = dependency.y
-                    /**
-                     * Handle FAB only when Snack is hidden
-                     */
-                    if(currentSnackBarPosition == 0f){
-                        val navPosOffset = initNavigationPosition - currentNavigationPosition
-                        if(translucentNavigationEnabled){
-                            if(currentNavigationPosition > translucentBarY){
-                                child.y = initFABPosition + bottomNavigationHeight
-                            }else{
-                                child.y = initFABPosition - navPosOffset
-                            }
+    private fun updateFloatingActionButton(child: V, dependency: View) {
+        when(dependency) {
+            is ANBottomNavigation -> {
+                currentNavigationPosition = dependency.y
+                /**
+                 * Handle FAB only when Snack is hidden
+                 */
+                if(currentSnackBarPosition == 0f){
+                    val navPosOffset = initNavigationPosition - currentNavigationPosition
+                    if(insetBottom > 0){
+                        if(currentNavigationPosition > translucentBarY){
+                            child.y = initFABPosition + bottomNavigationHeight
                         }else{
                             child.y = initFABPosition - navPosOffset
                         }
+                    }else{
+                        child.y = initFABPosition - navPosOffset
                     }
                 }
-                is Snackbar.SnackbarLayout -> {
-                    currentSnackBarPosition = dependency.y
+            }
+            is Snackbar.SnackbarLayout -> {
+                currentSnackBarPosition = dependency.y
 
-                    val snackPosOffset = initSnackBarPosition - currentSnackBarPosition
-                    val navPosOffset = initNavigationPosition - currentNavigationPosition
+                val snackPosOffset = initSnackBarPosition - currentSnackBarPosition
+                val navPosOffset = initNavigationPosition - currentNavigationPosition
 
-                    if(translucentNavigationEnabled){
-                        if (currentNavigationPosition > translucentBarY) {
-                            /**
-                             * Bottom navigation below android navigation bar
-                             */
-                            if (currentSnackBarPosition > translucentBarY) {
-                                /**
-                                 * Snack below android navigation bar
-                                 */
-                                child.y = initFABPosition + bottomNavigationHeight
-                            }else{
-                                /**
-                                 * Snack above android navigation bar
-                                 */
-                                child.y = initFABPosition + fabMarginBottom - snackPosOffset
-                            }
-                        } else {
-                            /**
-                             * Bottom navigation above android navigation bar
-                             */
-                            if (currentSnackBarPosition > currentNavigationPosition) {
-                                /**
-                                 * Snack below bottom navigation
-                                 */
-                                child.y = initFABPosition - navPosOffset
-                            }else{
-                                /**
-                                 * Snack above bottom navigation
-                                 */
-                                child.y = initFABPosition + fabMarginBottom - snackPosOffset
-                            }
-                        }
-                    }else{
+                if(insetBottom > 0){
+                    if (currentNavigationPosition > translucentBarY) {
                         /**
-                         * Translucent navigation disabled
+                         * Bottom navigation below android navigation bar
                          */
-                        child.y = initFABPosition + bottomNavigationHeight - snackPosOffset
+                        if (currentSnackBarPosition > translucentBarY) {
+                            /**
+                             * Snack below android navigation bar
+                             */
+                            child.y = initFABPosition + bottomNavigationHeight
+                        }else{
+                            /**
+                             * Snack above android navigation bar
+                             */
+                            child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                        }
+                    } else {
+                        /**
+                         * Bottom navigation above android navigation bar
+                         */
+                        if (currentSnackBarPosition > currentNavigationPosition) {
+                            /**
+                             * Snack below bottom navigation
+                             */
+                            child.y = initFABPosition - navPosOffset
+                        }else{
+                            /**
+                             * Snack above bottom navigation
+                             */
+                            child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                        }
                     }
+                }else{
+                    /**
+                     * Translucent navigation disabled
+                     */
+                    child.y = initFABPosition + bottomNavigationHeight - snackPosOffset
                 }
             }
         }
@@ -199,11 +193,11 @@ class ANFloatingActionButtonBehavior<V : View>(
     /**
      * set FAB position when Snack disappears
      */
-    override fun onDependentViewRemoved(parent: CoordinatorLayout?, child: V?, dependency: View?) {
-        if(dependency != null && dependency is Snackbar.SnackbarLayout && child != null) {
+    override fun onDependentViewRemoved(parent: CoordinatorLayout, child: V, dependency: View) {
+        if(behaviorTranslationInitialized && dependency is Snackbar.SnackbarLayout) {
             currentSnackBarPosition = 0f
             val navPosOffset = initNavigationPosition - currentNavigationPosition
-            if (translucentNavigationEnabled) {
+            if (insetBottom > 0) {
                 if (currentNavigationPosition > translucentBarY) {
                     /**
                      * Bottom navigation below android navigation bar
@@ -230,8 +224,3 @@ class ANFloatingActionButtonBehavior<V : View>(
         super.onDependentViewRemoved(parent, child, dependency)
     }
 }
-
-
-
-
-
