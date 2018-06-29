@@ -13,7 +13,7 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 * Updated libraries versions
 * Optimized screen bounds calculation algorithm
 
-* [Check out](https://github.com/Afflya/afflyasnavigation/tree/api28-preview) Android P version of the library with display cutout support
+[Check out](https://github.com/Afflya/afflyasnavigation/tree/api28-preview) Android P version of the library with display cutout support
 
 ## Configuration
 
