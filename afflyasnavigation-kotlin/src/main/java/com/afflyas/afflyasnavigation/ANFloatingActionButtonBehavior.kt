@@ -91,7 +91,7 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
                         initNavigationPosition = if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
                             (displayHeight - bottomNavigationHeight - insetBottom).toFloat()
                         }else{
-                            dependency.y
+                            dependency.y - bottomNavigationHeight
                         }
                         currentNavigationPosition = dependency.y
                     }
