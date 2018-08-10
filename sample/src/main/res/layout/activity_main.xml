@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinator"
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.afflyas.sample.MainActivity">
+    tools:context="com.afflyas.sample.MainActivity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.afflyas.afflyasnavigation.ANTopBar
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        app:ANTopBar_BehaviorTranslationEnabled="true"
+        app:behaviorTranslationEnabled="true"
         android:background="@color/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -21,36 +21,11 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <android.support.v7.widget.Toolbar
+            <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
-
-            <android.support.design.widget.TabLayout
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <android.support.design.widget.TabItem
-                    android:id="@+id/tabItem"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="111" />
-
-                <android.support.design.widget.TabItem
-                    android:id="@+id/tabItem2"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="222" />
-
-                <android.support.design.widget.TabItem
-                    android:id="@+id/tabItem3"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="333" />
-
-            </android.support.design.widget.TabLayout>
 
         </LinearLayout>
 
@@ -68,103 +43,104 @@
         android:id="@+id/botNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:behaviorTranslationEnabled="true"
+        app:colored="true"
+        app:titleState="always_show"
+        app:itemsMenu="@xml/bot_nav_menu"
         android:layout_gravity="bottom"/>
 
-    <android.support.v4.widget.NestedScrollView
-        android:id="@+id/nestedScrollView"
+    <com.afflyas.afflyasnavigation.ANVerticalContentContainer
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context="com.afflyas.scrolling.ScrollingActivity">
+        android:layout_height="match_parent">
 
-        <LinearLayout
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="50dp"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-            <android.support.v4.widget.Space
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="105dp" />
-
-            <Switch
-                android:id="@+id/coloredSwitch"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:checked="true"
-                android:text="Colored bottom navigation " />
+                android:orientation="vertical">
 
-            <Switch
-                android:id="@+id/enableTopBarScrollSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:checked="true"
-                android:text="Top bar scrolling behavior " />
+                <com.afflyas.afflyasnavigation.ANSpaceTop
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:topBarHeightMode="default_action_bar"/>
 
-            <Switch
-                android:id="@+id/enableBotNavScrollSwitch"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:layout_marginTop="20dp"
-                android:checked="true"
-                android:text="Bottom navigation scrolling behavior " />
-
-            <RadioGroup
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:layout_gravity="center_horizontal">
-
-                <RadioButton
-                    android:id="@+id/defaultTitle"
+                <Switch
+                    android:id="@+id/coloredSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Show title when active" />
-
-                <RadioButton
-                    android:id="@+id/showTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
                     android:checked="true"
-                    android:text="Always show title" />
+                    android:text="Colored bottom navigation " />
 
-                <RadioButton
-                    android:id="@+id/noTitle"
+                <Switch
+                    android:id="@+id/enableTopBarScrollSwitch"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="No title" />
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:checked="true"
+                    android:text="Top bar scrolling behavior " />
+
+                <Switch
+                    android:id="@+id/enableBotNavScrollSwitch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="20dp"
+                    android:checked="true"
+                    android:text="Bottom navigation scrolling behavior " />
+
+                <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:layout_gravity="center_horizontal">
+
+                    <RadioButton
+                        android:id="@+id/defaultTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Show title when active" />
+
+                    <RadioButton
+                        android:id="@+id/showTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:checked="true"
+                        android:text="Always show title" />
+
+                    <RadioButton
+                        android:id="@+id/noTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="No title" />
+
+                </RadioGroup>
 
                 <TextView
                     android:layout_gravity="center_horizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filler_title" />
-
-                <TextView
-                    android:layout_gravity="center_horizontal"
+                    android:padding="10dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/filler_text" />
 
-                <android.support.v4.widget.Space
+                <com.afflyas.afflyasnavigation.ANSpaceBottom
                     android:layout_width="match_parent"
-                    android:layout_height="100dp" />
+                    android:layout_height="wrap_content"
+                    app:withANBottomNavigation="true"/>
 
-            </RadioGroup>
+            </LinearLayout>
 
+        </androidx.core.widget.NestedScrollView>
 
+    </com.afflyas.afflyasnavigation.ANVerticalContentContainer>
 
-        </LinearLayout>
-
-    </android.support.v4.widget.NestedScrollView>
-
-
-
-</android.support.design.widget.CoordinatorLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

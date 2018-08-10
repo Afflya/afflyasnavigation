@@ -3,6 +3,7 @@ package com.afflyas.afflyasnavigation
 import android.animation.Animator
 import android.content.Context
 import android.content.res.Configuration
+import android.content.res.XmlResourceParser
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Typeface
@@ -10,26 +11,24 @@ import android.graphics.drawable.Drawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Parcelable
-import android.support.annotation.ColorInt
-import android.support.annotation.ColorRes
-import android.support.annotation.DrawableRes
-import android.support.annotation.RequiresApi
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.content.ContextCompat
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.AttributeSet
 import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
-import android.widget.FrameLayout
-import android.widget.ImageView
-import android.widget.LinearLayout
-import android.widget.TextView
+import android.widget.*
+import androidx.annotation.*
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
+import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.ViewCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.notification.ANNotification
 import com.afflyas.afflyasnavigation.notification.ANNotificationHelper
+import org.xmlpull.v1.XmlPullParser
+import org.xmlpull.v1.XmlPullParserException
 import java.util.*
 
 class ANBottomNavigation : FrameLayout {
@@ -75,6 +74,9 @@ class ANBottomNavigation : FrameLayout {
 
     var behaviorTranslationEnabled = true
         private set
+
+    var scrollingDeadZone = VerticalScrollingBehavior.DEFAULT_DEAD_ZONE
+
     /**
      * indicates that insets were set
      */
@@ -149,9 +151,11 @@ class ANBottomNavigation : FrameLayout {
         if (parent is CoordinatorLayout) {
             if (bottomNavigationBehavior == null) {
                 bottomNavigationBehavior = ANBottomNavigationBehavior(behaviorTranslationEnabled, insetLeft, insetRight, insetBottom)
+                bottomNavigationBehavior!!.scrollingDeadZone = scrollingDeadZone
             } else {
                 bottomNavigationBehavior!!.setBehaviorTranslationEnabled(behaviorTranslationEnabled)
                 bottomNavigationBehavior!!.setInsets(insetLeft, insetRight, insetBottom)
+                bottomNavigationBehavior!!.scrollingDeadZone = scrollingDeadZone
             }
 
             (layoutParams as CoordinatorLayout.LayoutParams).behavior = bottomNavigationBehavior
@@ -182,63 +186,62 @@ class ANBottomNavigation : FrameLayout {
         when{
         /**
          * P(or later) insets with cutout support
-         * TODO uncomment these lines if your target sdk version >= 28
          */
-//            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-//                val insets = rootView.rootWindowInsets
-//                val notch = insets.displayCutout
-//
-////                    Log.d("development", "stable insets\n" +
-////                            "systemWindowInsetTop = ${insets.stableInsetTop}\n" +
-////                            "systemWindowInsetBottom = ${insets.stableInsetBottom}\n" +
-////                            "systemWindowInsetLeft = ${insets.stableInsetLeft}\n" +
-////                            "systemWindowInsetRight = ${insets.stableInsetRight}\n" +
-////                            "")
-////                    Log.d("development", "system insets\n" +
-////                            "systemWindowInsetTop = ${insets.systemWindowInsetTop}\n" +
-////                            "systemWindowInsetBottom = ${insets.systemWindowInsetBottom}\n" +
-////                            "systemWindowInsetLeft = ${insets.systemWindowInsetLeft}\n" +
-////                            "systemWindowInsetRight = ${insets.systemWindowInsetRight}\n" +
-////                            "")
-////                    Log.d("development", "displayCutout\n" +
-////                            "systemWindowInsetTop = ${insets.displayCutout.safeInsetTop}\n" +
-////                            "systemWindowInsetBottom = ${insets.displayCutout.safeInsetBottom}\n" +
-////                            "systemWindowInsetLeft = ${insets.displayCutout.safeInsetLeft}\n" +
-////                            "systemWindowInsetRight = ${insets.displayCutout.safeInsetRight}\n" +
-////                            "")
-//
-//                if(ANHelper.isInMultiWindow(context)){
-//                    if(notch != null){
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                        insetBottom = insets.systemWindowInsetBottom
-//                        /**
-//                         * stable insets -insets without notch
-//                         */
-//                        if(insets.stableInsetLeft != 0) insetLeft = 0
-//                        if(insets.stableInsetRight != 0) insetRight = 0
-//                        if(insets.stableInsetBottom != 0) insetBottom = 0
-//                    }
-//                }else{
-//                    if(translucentNavigationThemeEnabled){
-//                        insetBottom = insets.systemWindowInsetBottom
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                    }else{
-//                        if(notch != null){
-//                            insetLeft = notch.safeInsetLeft
-//                            insetRight = notch.safeInsetRight
-//                            insetBottom = notch.safeInsetBottom
-//                            /**
-//                             * stable insets -insets without notch
-//                             */
-//                            if(insets.stableInsetLeft != 0) insetLeft = 0
-//                            if(insets.stableInsetRight != 0) insetRight = 0
-//                            if(insets.stableInsetBottom != 0) insetBottom = 0
-//                        }
-//                    }
-//                }
-//            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                val insets = rootView.rootWindowInsets
+                val notch = insets.displayCutout
+
+//                    Log.d("development", "stable insets\n" +
+//                            "systemWindowInsetTop = ${insets.stableInsetTop}\n" +
+//                            "systemWindowInsetBottom = ${insets.stableInsetBottom}\n" +
+//                            "systemWindowInsetLeft = ${insets.stableInsetLeft}\n" +
+//                            "systemWindowInsetRight = ${insets.stableInsetRight}\n" +
+//                            "")
+//                    Log.d("development", "system insets\n" +
+//                            "systemWindowInsetTop = ${insets.systemWindowInsetTop}\n" +
+//                            "systemWindowInsetBottom = ${insets.systemWindowInsetBottom}\n" +
+//                            "systemWindowInsetLeft = ${insets.systemWindowInsetLeft}\n" +
+//                            "systemWindowInsetRight = ${insets.systemWindowInsetRight}\n" +
+//                            "")
+//                    Log.d("development", "displayCutout\n" +
+//                            "systemWindowInsetTop = ${insets.displayCutout.safeInsetTop}\n" +
+//                            "systemWindowInsetBottom = ${insets.displayCutout.safeInsetBottom}\n" +
+//                            "systemWindowInsetLeft = ${insets.displayCutout.safeInsetLeft}\n" +
+//                            "systemWindowInsetRight = ${insets.displayCutout.safeInsetRight}\n" +
+//                            "")
+
+                if(ANHelper.isInMultiWindow(context)){
+                    if(notch != null){
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                        insetBottom = insets.systemWindowInsetBottom
+                        /**
+                         * stable insets -insets without notch
+                         */
+                        if(insets.stableInsetLeft != 0) insetLeft = 0
+                        if(insets.stableInsetRight != 0) insetRight = 0
+                        if(insets.stableInsetBottom != 0) insetBottom = 0
+                    }
+                }else{
+                    if(translucentNavigationThemeEnabled){
+                        insetBottom = insets.systemWindowInsetBottom
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                    }else{
+                        if(notch != null){
+                            insetLeft = notch.safeInsetLeft
+                            insetRight = notch.safeInsetRight
+                            insetBottom = notch.safeInsetBottom
+                            /**
+                             * stable insets -insets without notch
+                             */
+                            if(insets.stableInsetLeft != 0) insetLeft = 0
+                            if(insets.stableInsetRight != 0) insetRight = 0
+                            if(insets.stableInsetBottom != 0) insetBottom = 0
+                        }
+                    }
+                }
+            }
         /**
          * Nougat and Oreo insets
          */
@@ -253,7 +256,7 @@ class ANBottomNavigation : FrameLayout {
         /**
          * Marshmallow insets
          */
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                 val insets = rootView.rootWindowInsets
                 if(translucentNavigationThemeEnabled){
                     insetBottom = insets.systemWindowInsetBottom
@@ -292,7 +295,7 @@ class ANBottomNavigation : FrameLayout {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             calcInsets()
         }else{
@@ -301,6 +304,7 @@ class ANBottomNavigation : FrameLayout {
              */
             bringToFront()
         }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas?) {
@@ -366,23 +370,40 @@ class ANBottomNavigation : FrameLayout {
         coloredTitleColorInactive = ContextCompat.getColor(context, R.color.colorBottomNavigationInactiveColored)
 
         if (attrs != null) {
-            val ta = context.obtainStyledAttributes(attrs, R.styleable.ANBottomNavigationBehavior_Params, 0, 0)
+            val ta = context.obtainStyledAttributes(attrs, R.styleable.ANBottomNavigation, 0, 0)
             try {
-                selectedBackgroundVisible = ta.getBoolean(R.styleable.ANBottomNavigationBehavior_Params_selectedBackgroundVisible, false)
+                selectedBackgroundVisible = ta.getBoolean(R.styleable.ANBottomNavigation_selectedBackgroundVisible, false)
 
-                titleColorActive = ta.getColor(R.styleable.ANBottomNavigationBehavior_Params_accentColor,
+                behaviorTranslationEnabled = ta.getBoolean(R.styleable.ANBottomNavigation_behaviorTranslationEnabled, false)
+                scrollingDeadZone = ta.getInteger(R.styleable.ANBottomNavigation_scrollingDeadZone, VerticalScrollingBehavior.DEFAULT_DEAD_ZONE)
+
+
+                when(ta.getInt(R.styleable.ANBottomNavigation_titleState, 1)){
+                    1 -> titleState = TitleState.SHOW_WHEN_ACTIVE
+                    2 -> titleState = TitleState.ALWAYS_SHOW
+                    3 -> titleState = TitleState.ALWAYS_HIDE
+                }
+
+                titleColorActive = ta.getColor(R.styleable.ANBottomNavigation_accentColor,
                         ContextCompat.getColor(context, R.color.colorBottomNavigationAccent))
-                titleColorInactive = ta.getColor(R.styleable.ANBottomNavigationBehavior_Params_inactiveColor,
+                titleColorInactive = ta.getColor(R.styleable.ANBottomNavigation_inactiveColor,
                         ContextCompat.getColor(context, R.color.colorBottomNavigationInactive))
-                itemDisableColor = ta.getColor(R.styleable.ANBottomNavigationBehavior_Params_disableColor,
+
+                itemDisableColor = ta.getColor(R.styleable.ANBottomNavigation_disableColor,
                         ContextCompat.getColor(context, R.color.colorBottomNavigationDisable))
 
-                coloredTitleColorActive = ta.getColor(R.styleable.ANBottomNavigationBehavior_Params_coloredActive,
+                coloredTitleColorActive = ta.getColor(R.styleable.ANBottomNavigation_coloredActive,
                         ContextCompat.getColor(context, R.color.colorBottomNavigationActiveColored))
-                coloredTitleColorInactive = ta.getColor(R.styleable.ANBottomNavigationBehavior_Params_coloredInactive,
+                coloredTitleColorInactive = ta.getColor(R.styleable.ANBottomNavigation_coloredInactive,
                         ContextCompat.getColor(context, R.color.colorBottomNavigationInactiveColored))
 
-                colored = ta.getBoolean(R.styleable.ANBottomNavigationBehavior_Params_colored, false)
+                colored = ta.getBoolean(R.styleable.ANBottomNavigation_colored, false)
+
+                /**
+                 * parse items from xml-menu resource
+                 */
+                val menuRes = ta.getResourceId(R.styleable.ANBottomNavigation_itemsMenu, 0)
+                parseItemsFromXmlMenu(menuRes)
 
             } finally {
                 ta.recycle()
@@ -392,8 +413,10 @@ class ANBottomNavigation : FrameLayout {
         notificationTextColor = ContextCompat.getColor(context, android.R.color.white)
         bottomNavigationHeight = resources.getDimension(R.dimen.bottom_navigation_height).toInt()
 
-        itemActiveColor = titleColorActive
-        itemInactiveColor = titleColorInactive
+
+        itemActiveColor = if (colored) coloredTitleColorActive else titleColorActive
+        itemInactiveColor = if (colored) coloredTitleColorInactive else titleColorInactive
+
 
         // Notifications
         notificationActiveMarginLeft = resources.getDimension(R.dimen.bottom_navigation_notification_margin_left_active).toInt()
@@ -409,6 +432,70 @@ class ANBottomNavigation : FrameLayout {
                 ViewGroup.LayoutParams.MATCH_PARENT, bottomNavigationHeight)
         layoutParams = params
     }
+
+    /**
+     * parse items from xml-menu resource
+     */
+    @Suppress("DEPRECATION")
+    private fun parseItemsFromXmlMenu(menuRes: Int){
+        if(menuRes != 0){
+            try {
+                val xml: XmlResourceParser = resources.getXml(menuRes)
+
+                var eventType = xml.eventType
+                while (eventType != XmlPullParser.END_DOCUMENT) {
+                    if(eventType == XmlPullParser.START_TAG) {
+                        var itemTitleRes: Int? = null
+                        var itemIconRes: Int? = null
+                        var itemColorRes: Int? = null
+                        for (i in 0..(xml.attributeCount - 1)){
+                            when(xml.getAttributeName(i)){
+                                "title" -> {
+                                    itemTitleRes = Integer.parseInt(xml.getAttributeValue(i).substring(1))
+                                }
+                                "icon" -> {
+                                    itemIconRes = Integer.parseInt(xml.getAttributeValue(i).substring(1))
+                                }
+                                "color" -> {
+                                    itemColorRes = Integer.parseInt(xml.getAttributeValue(i).substring(1))
+                                }
+                            }
+                        }
+
+//
+
+                        if(itemTitleRes != null && itemIconRes != null){
+                            val newItem: ANBottomNavigationItem
+
+                            if(itemColorRes == null){
+                                newItem = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    ANBottomNavigationItem(resources.getString(itemTitleRes), resources.getDrawable(itemIconRes, null))
+                                }else{
+                                    ANBottomNavigationItem(resources.getString(itemTitleRes), resources.getDrawable(itemIconRes))
+                                }
+                            }else{
+                                newItem = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                                        ANBottomNavigationItem(resources.getString(itemTitleRes), resources.getDrawable(itemIconRes, null), resources.getColor(itemColorRes,null))
+                                    }else{
+                                        ANBottomNavigationItem(resources.getString(itemTitleRes), resources.getDrawable(itemIconRes, null), resources.getColor(itemColorRes))
+                                    }
+                                }else{
+
+                                    ANBottomNavigationItem(resources.getString(itemTitleRes), resources.getDrawable(itemIconRes), resources.getColor(itemColorRes))
+                                }
+                            }
+                            items.add(newItem)
+                        }
+                    }
+                    eventType = xml.next()
+                }
+            } catch (e: XmlPullParserException) {
+                throw IllegalArgumentException("Wrong ANBottomNavigation itemsMenu attribute format")
+            }
+        }
+    }
+
 
     /**
      * Create the items in the bottom navigation
@@ -565,7 +652,7 @@ class ANBottomNavigation : FrameLayout {
             title.setTextSize(TypedValue.COMPLEX_UNIT_PX, if (current) activeSize else inactiveSize)
 
             if (itemsEnabledStates[i]) {
-                view.setOnClickListener({ updateItems(i, true) })
+                view.setOnClickListener { updateItems(i, true) }
                 icon.setImageDrawable(ANHelper.getTintDrawable(items[i].getDrawable(context)!!,
                         if (current) itemActiveColor else itemInactiveColor, forceTint))
                 title.setTextColor(if (current) itemActiveColor else itemInactiveColor)
@@ -643,13 +730,13 @@ class ANBottomNavigation : FrameLayout {
 
             if (i == currentItem) {
                 if (selectedBackgroundVisible) {
-                    view.setSelected(true)
+                    view.isSelected = true
                 }
                 icon.isSelected = true
                 // Update margins (icon & notification)
 
                 if (titleState != TitleState.ALWAYS_HIDE) {
-                    if (view.getLayoutParams() is ViewGroup.MarginLayoutParams) {
+                    if (view.layoutParams is ViewGroup.MarginLayoutParams) {
                         val p = icon.layoutParams as ViewGroup.MarginLayoutParams
                         p.setMargins(p.leftMargin, activeMarginTop, p.rightMargin, p.bottomMargin)
 
@@ -685,7 +772,7 @@ class ANBottomNavigation : FrameLayout {
                         if (currentItem == i) itemActiveColor else itemInactiveColor, forceTint))
                 title.setTextColor(if (currentItem == i) itemActiveColor else itemInactiveColor)
                 title.alpha = (if (currentItem == i) 1 else 0).toFloat()
-                view.setOnClickListener({ updateSmallItems(i, true) })
+                view.setOnClickListener { updateSmallItems(i, true) }
                 view.isSoundEffectsEnabled = soundEffectsEnabled
             } else {
                 icon.setImageDrawable(ANHelper.getTintDrawable(items[i].getDrawable(context)!!,
@@ -1445,8 +1532,8 @@ class ANBottomNavigation : FrameLayout {
     /**
      * Set fully customized Notification
      *
-     * @param notification AHNotification
-     * @param itemPosition int
+     * @param inputNotification AHNotification
+     * @param itemPosition Int
      */
     fun setNotification(inputNotification: ANNotification?, itemPosition: Int) {
         var notification = inputNotification

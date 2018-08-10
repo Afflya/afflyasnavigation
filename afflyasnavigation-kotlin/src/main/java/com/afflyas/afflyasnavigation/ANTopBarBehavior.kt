@@ -3,26 +3,31 @@ package com.afflyas.afflyasnavigation
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPropertyAnimatorCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.AttributeSet
+import android.util.Log
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.annotation.RequiresApi
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 
 class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     companion object {
-        private val INTERPOLATOR = LinearOutSlowInInterpolator()
-        private const val ANIM_DURATION = 300
+        private val INTERPOLATOR = AccelerateDecelerateInterpolator()
+        private const val ANIM_DURATION = 350
     }
 
     private var hidden = false
     private var translationAnimator: ViewPropertyAnimatorCompat? = null
     private var translationObjectAnimator: ObjectAnimator? = null
     var behaviorTranslationEnabled = false
+
+
+    var scrollingDeadZone = VerticalScrollingBehavior.DEFAULT_DEAD_ZONE
 
     /**
      * Constructor
@@ -45,9 +50,10 @@ class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
-        if (dyConsumed < 0) {
+        //Log.d("myDev", "onNestedScroll dyConsumed = " + dyConsumed)
+        if (dyConsumed < -scrollingDeadZone) {
             handleDirection(child, SCROLL_DIRECTION_DOWN)
-        } else if (dyConsumed > 0) {
+        } else if (dyConsumed > scrollingDeadZone) {
             handleDirection(child, SCROLL_DIRECTION_UP)
         }
     }

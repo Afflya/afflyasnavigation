@@ -8,9 +8,6 @@ import android.content.ContextWrapper
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
-import android.support.annotation.ColorInt
-import android.support.annotation.RequiresApi
-import android.support.v4.graphics.drawable.DrawableCompat
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
@@ -18,6 +15,9 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.annotation.RequiresApi
+import androidx.core.graphics.drawable.DrawableCompat
 
 object ANHelper {
 

@@ -2,12 +2,13 @@ package com.afflyas.afflyasnavigation
 
 import android.content.Context
 import android.os.Build
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.Snackbar
 import android.util.DisplayMetrics
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.snackbar.Snackbar
 
 
 class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>() {

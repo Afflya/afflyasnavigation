@@ -2,8 +2,8 @@ package com.afflyas.afflyasnavigation.notification
 
 import android.os.Parcel
 import android.os.Parcelable
-import android.support.annotation.ColorInt
 import android.text.TextUtils
+import androidx.annotation.ColorInt
 import java.util.ArrayList
 
 class ANNotification : Parcelable {
@@ -56,7 +56,7 @@ class ANNotification : Parcelable {
             return notificationList
         }
 
-        val CREATOR: Parcelable.Creator<ANNotification> = object : Parcelable.Creator<ANNotification> {
+        @JvmField val CREATOR: Parcelable.Creator<ANNotification> = object : Parcelable.Creator<ANNotification> {
             override fun createFromParcel(inputParcel: Parcel): ANNotification {
                 return ANNotification(inputParcel)
             }
@@ -97,6 +97,5 @@ class ANNotification : Parcelable {
             return notification
         }
     }
-
 
 }

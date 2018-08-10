@@ -1,6 +1,6 @@
 package com.afflyas.afflyasnavigation.notification
 
-import android.support.annotation.ColorInt
+import androidx.annotation.ColorInt
 
 object ANNotificationHelper {
 

@@ -2,20 +2,22 @@ package com.afflyas.afflyasnavigation
 
 import android.animation.ObjectAnimator
 import android.os.Build
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.Snackbar
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.ViewPropertyAnimatorCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.core.view.ViewPropertyAnimatorCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
+import com.google.android.material.snackbar.Snackbar
 
 class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     companion object {
-        private val INTERPOLATOR = LinearOutSlowInInterpolator()
-        private const val ANIM_DURATION = 300
+        private val INTERPOLATOR = AccelerateDecelerateInterpolator()
+        private const val ANIM_DURATION = 350
     }
     /**
      * Is hidden
@@ -29,6 +31,8 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
     private var targetOffset = 0f
 
     private var behaviorTranslationEnabled = false
+
+    var scrollingDeadZone = VerticalScrollingBehavior.DEFAULT_DEAD_ZONE
 
     /**
      * system window inset values that has been set as padding
@@ -82,9 +86,9 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
-        if (dyConsumed < 0) {
+        if (dyConsumed < -scrollingDeadZone) {
             handleDirection(child, VerticalScrollingBehavior.SCROLL_DIRECTION_DOWN)
-        } else if (dyConsumed > 0) {
+        } else if (dyConsumed > scrollingDeadZone) {
             handleDirection(child, VerticalScrollingBehavior.SCROLL_DIRECTION_UP)
         }
     }
@@ -92,6 +96,8 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
     override fun onStartNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, directTargetChild: View, target: View, axes: Int, type: Int): Boolean {
         return axes == ViewCompat.SCROLL_AXIS_VERTICAL || super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type)
     }
+
+
 
     /**
      * Handle scroll direction

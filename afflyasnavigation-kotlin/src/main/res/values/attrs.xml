@@ -1,10 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="behaviorTranslationEnabled" format="boolean" />
+    <attr name="scrollingDeadZone" format="integer" />
+
     <declare-styleable name="ANTopBar">
-        <attr name="ANTopBar_BehaviorTranslationEnabled" format="boolean" />
+        <attr name="behaviorTranslationEnabled" />
+        <attr name="scrollingDeadZone"/>
     </declare-styleable>
 
-    <declare-styleable name="ANBottomNavigationBehavior_Params">
+    <declare-styleable name="ANSpaceBottom">
+        <attr name="withANBottomNavigation" format="boolean" />
+    </declare-styleable>
+
+    <declare-styleable name="ANSpaceTop">
+        <attr name="topBarHeightMode">
+            <enum name="default_action_bar" value="1" />
+            <enum name="action_bar_with_tabs" value="2" />
+            <enum name="custom_top_bar" value="3" />
+        </attr>
+    </declare-styleable>
+
+    <declare-styleable name="ANBottomNavigation">
+        <attr name="titleState">
+            <enum name="show_when_active" value="1" />
+            <enum name="always_show" value="2" />
+            <enum name="always_hide" value="3" />
+        </attr>
+        <attr name="scrollingDeadZone"/>
+        <attr name="itemsMenu" format="integer" />
+        <attr name="behaviorTranslationEnabled" />
         <attr name="selectedBackgroundVisible" format="boolean" />
         <attr name="colored" format="boolean" />
         <attr name="accentColor" format="color" />

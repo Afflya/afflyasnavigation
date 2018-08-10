@@ -51,5 +51,7 @@
     <dimen name="top_bar_elevation">2dp</dimen>
     <dimen name="android_status_bar_height">24dp</dimen>
     <dimen name="android_navigation_bar_height">48dp</dimen>
+    <dimen name="space_top_only_action_bar">48dp</dimen>
+    <dimen name="space_top_action_bar_with_tabs">96dp</dimen>
 
 </resources>

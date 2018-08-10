@@ -4,12 +4,12 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.view.ViewCompat
-import android.support.v4.view.animation.LinearOutSlowInInterpolator
 import android.util.AttributeSet
 import android.widget.FrameLayout
+import androidx.annotation.RequiresApi
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
+import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 
 
 class ANTopBar : FrameLayout {
@@ -36,6 +36,8 @@ class ANTopBar : FrameLayout {
     var behaviorTranslationEnabled: Boolean = false
         private set
 
+    var scrollingDeadZone = VerticalScrollingBehavior.DEFAULT_DEAD_ZONE
+
 
     constructor(context: Context) : super(context) {
         init(context, null)
@@ -49,11 +51,6 @@ class ANTopBar : FrameLayout {
         init(context, attrs)
     }
 
-    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int, defStyleRes: Int) : super(context, attrs, defStyleAttr, defStyleRes) {
-        init(context, attrs)
-    }
-
     private fun init(context: Context, attrs: AttributeSet?) {
 
         /**
@@ -62,7 +59,8 @@ class ANTopBar : FrameLayout {
         if (attrs != null) {
             val ta = context.obtainStyledAttributes(attrs, R.styleable.ANTopBar, 0, 0)
             try {
-                behaviorTranslationEnabled = ta.getBoolean(R.styleable.ANTopBar_ANTopBar_BehaviorTranslationEnabled, false)
+                behaviorTranslationEnabled = ta.getBoolean(R.styleable.ANTopBar_behaviorTranslationEnabled, false)
+                scrollingDeadZone = ta.getInteger(R.styleable.ANTopBar_scrollingDeadZone, VerticalScrollingBehavior.DEFAULT_DEAD_ZONE)
             } finally {
                 ta.recycle()
             }
@@ -102,50 +100,49 @@ class ANTopBar : FrameLayout {
         var insetTop = 0
 
         when{
-//        /**
-//         * P(and later) insets with cutout support
-//         * TODO uncomment these lines if your target sdk version >= 28
-//         */
-//            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-//                val insets = rootView.rootWindowInsets
-//
-//                if(translucentStatusThemeEnabled) insetTop = insets.systemWindowInsetTop
-//
-//                val notch = insets.displayCutout
-//
-//                if(ANHelper.isInMultiWindow(context)){
-//                    /**
-//                     *
-//                     * Set inset when in multi window mode
-//                     * Only for side with cutout but without navigation
-//                     *
-//                     */
-//                    if(notch != null){
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                        /**
-//                         * stable insets -insets without notch
-//                         */
-//                        if(insets.stableInsetLeft != 0) insetLeft = 0
-//                        if(insets.stableInsetRight != 0) insetRight = 0
-//                    }
-//                }else{
-//                    if(translucentNavigationThemeEnabled){
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                    }else{
-//                        if(notch != null){
-//                            insetLeft = notch.safeInsetLeft
-//                            insetRight = notch.safeInsetRight
-//                            /**
-//                             * stable insets -insets without notch
-//                             */
-//                            if(insets.stableInsetLeft != 0) insetLeft = 0
-//                            if(insets.stableInsetRight != 0) insetRight = 0
-//                        }
-//                    }
-//                }
-//            }
+        /**
+         * P(and later) insets with cutout support
+         */
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                val insets = rootView.rootWindowInsets
+
+                if(translucentStatusThemeEnabled) insetTop = insets.systemWindowInsetTop
+
+                val notch = insets.displayCutout
+
+                if(ANHelper.isInMultiWindow(context)){
+                    /**
+                     *
+                     * Set inset when in multi window mode
+                     * Only for side with cutout but without navigation
+                     *
+                     */
+                    if(notch != null){
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                        /**
+                         * stable insets -insets without notch
+                         */
+                        if(insets.stableInsetLeft != 0) insetLeft = 0
+                        if(insets.stableInsetRight != 0) insetRight = 0
+                    }
+                }else{
+                    if(translucentNavigationThemeEnabled){
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                    }else{
+                        if(notch != null){
+                            insetLeft = notch.safeInsetLeft
+                            insetRight = notch.safeInsetRight
+                            /**
+                             * stable insets -insets without notch
+                             */
+                            if(insets.stableInsetLeft != 0) insetLeft = 0
+                            if(insets.stableInsetRight != 0) insetRight = 0
+                        }
+                    }
+                }
+            }
         /**
          * Nougat and Oreo insets
          */
@@ -163,7 +160,7 @@ class ANTopBar : FrameLayout {
         /**
          * Marshmallow insets
          */
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.N -> {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
                 val insets = rootView.rootWindowInsets
                 if(translucentStatusThemeEnabled) insetTop = insets.systemWindowInsetTop
 
@@ -200,7 +197,7 @@ class ANTopBar : FrameLayout {
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
+
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             calcInsets()
         }else{
@@ -209,6 +206,8 @@ class ANTopBar : FrameLayout {
              */
             bringToFront()
         }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     /**
@@ -219,8 +218,10 @@ class ANTopBar : FrameLayout {
         if (parent is CoordinatorLayout) {
             if (topBarBehavior == null) {
                 topBarBehavior = ANTopBarBehavior(behaviorTranslationEnabled)
+                topBarBehavior!!.scrollingDeadZone = scrollingDeadZone
             } else {
                 topBarBehavior!!.behaviorTranslationEnabled = behaviorTranslationEnabled
+                topBarBehavior!!.scrollingDeadZone = scrollingDeadZone
             }
             (layoutParams as CoordinatorLayout.LayoutParams).behavior = topBarBehavior
         }

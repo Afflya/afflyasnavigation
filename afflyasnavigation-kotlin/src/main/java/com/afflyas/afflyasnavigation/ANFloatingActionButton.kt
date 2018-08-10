@@ -4,11 +4,11 @@ import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Canvas
 import android.os.Build
-import android.support.annotation.RequiresApi
-import android.support.design.widget.CoordinatorLayout
-import android.support.design.widget.FloatingActionButton
 import android.util.AttributeSet
 import android.view.Gravity
+import androidx.annotation.RequiresApi
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 //TODO add support for KITKAT's translucent navigation
 //TODO manage translation behavior for Gravity.TOP(move to top) and Gravity.CENTER_VERTICAL(do not move)
@@ -57,46 +57,45 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
         var insetBottom = 0
 
         when{
-//            /**
-//             * P(or later) insets with cutout support
-//             * TODO uncomment these lines if your target sdk version >= 28
-//             */
-//            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
-//                val insets = rootView.rootWindowInsets
-//                val notch = insets.displayCutout
-//
-//                if(ANHelper.isInMultiWindow(context)){
-//                    if(notch != null){
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                        insetBottom = insets.systemWindowInsetBottom
-//                        /**
-//                         * stable insets -insets without notch
-//                         */
-//                        if(insets.stableInsetLeft != 0) insetLeft = 0
-//                        if(insets.stableInsetRight != 0) insetRight = 0
-//                        if(insets.stableInsetBottom != 0) insetBottom = 0
-//                    }
-//                }else{
-//                    if(translucentNavigationThemeEnabled){
-//                        insetBottom = insets.systemWindowInsetBottom
-//                        insetLeft = insets.systemWindowInsetLeft
-//                        insetRight = insets.systemWindowInsetRight
-//                    }else{
-//                        if(notch != null){
-//                            insetLeft = notch.safeInsetLeft
-//                            insetRight = notch.safeInsetRight
-//                            insetBottom = notch.safeInsetBottom
-//                            /**
-//                             * stable insets -insets without notch
-//                             */
-//                            if(insets.stableInsetLeft != 0) insetLeft = 0
-//                            if(insets.stableInsetRight != 0) insetRight = 0
-//                            if(insets.stableInsetBottom != 0) insetBottom = 0
-//                        }
-//                    }
-//                }
-//            }
+            /**
+             * P(or later) insets with cutout support
+             */
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.P -> {
+                val insets = rootView.rootWindowInsets
+                val notch = insets.displayCutout
+
+                if(ANHelper.isInMultiWindow(context)){
+                    if(notch != null){
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                        insetBottom = insets.systemWindowInsetBottom
+                        /**
+                         * stable insets -insets without notch
+                         */
+                        if(insets.stableInsetLeft != 0) insetLeft = 0
+                        if(insets.stableInsetRight != 0) insetRight = 0
+                        if(insets.stableInsetBottom != 0) insetBottom = 0
+                    }
+                }else{
+                    if(translucentNavigationThemeEnabled){
+                        insetBottom = insets.systemWindowInsetBottom
+                        insetLeft = insets.systemWindowInsetLeft
+                        insetRight = insets.systemWindowInsetRight
+                    }else{
+                        if(notch != null){
+                            insetLeft = notch.safeInsetLeft
+                            insetRight = notch.safeInsetRight
+                            insetBottom = notch.safeInsetBottom
+                            /**
+                             * stable insets -insets without notch
+                             */
+                            if(insets.stableInsetLeft != 0) insetLeft = 0
+                            if(insets.stableInsetRight != 0) insetRight = 0
+                            if(insets.stableInsetBottom != 0) insetBottom = 0
+                        }
+                    }
+                }
+            }
             /**
              * Nougat and Oreo insets
              */
@@ -149,7 +148,6 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             calcInsets()
@@ -159,6 +157,8 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
              */
             bringToFront()
         }
+
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec)
     }
 
     override fun onDraw(canvas: Canvas?) {

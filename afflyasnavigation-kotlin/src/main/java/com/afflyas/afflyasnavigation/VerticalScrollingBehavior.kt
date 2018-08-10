@@ -1,11 +1,11 @@
 package com.afflyas.afflyasnavigation
 
 import android.content.Context
-import android.support.annotation.IntDef
-import android.support.design.widget.CoordinatorLayout
-import android.support.v4.view.ViewCompat
 import android.util.AttributeSet
 import android.view.View
+import androidx.annotation.IntDef
+import androidx.coordinatorlayout.widget.CoordinatorLayout
+import androidx.core.view.ViewCompat
 
 abstract class VerticalScrollingBehavior<V : View> : CoordinatorLayout.Behavior<V> {
 
@@ -13,6 +13,8 @@ abstract class VerticalScrollingBehavior<V : View> : CoordinatorLayout.Behavior<
         const val SCROLL_DIRECTION_UP = 1
         const val SCROLL_DIRECTION_DOWN = -1
         const val SCROLL_NONE = 0
+
+        const val DEFAULT_DEAD_ZONE = 10
 
         @IntDef(SCROLL_DIRECTION_UP, SCROLL_DIRECTION_DOWN, SCROLL_NONE)
         @Retention(AnnotationRetention.SOURCE)
