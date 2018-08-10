@@ -6,6 +6,12 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 
+/**
+ *
+ * Layout that used to fill top space
+ * based on the presence of a display cutout and translucent status bar
+ *
+ */
 class ANSpaceTop : FrameLayout {
 
     private var topBarHeightMode = 1

@@ -17,12 +17,16 @@ import android.util.TypedValue
 import android.view.*
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
-import android.widget.*
-import androidx.annotation.*
+import android.widget.FrameLayout
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.annotation.ColorInt
+import androidx.annotation.ColorRes
+import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.view.ViewCompat
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.notification.ANNotification
@@ -461,8 +465,6 @@ class ANBottomNavigation : FrameLayout {
                                 }
                             }
                         }
-
-//
 
                         if(itemTitleRes != null && itemIconRes != null){
                             val newItem: ANBottomNavigationItem

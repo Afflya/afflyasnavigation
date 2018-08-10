@@ -3,7 +3,6 @@ package com.afflyas.afflyasnavigation
 import android.content.Context
 import android.os.Build
 import android.util.DisplayMetrics
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager

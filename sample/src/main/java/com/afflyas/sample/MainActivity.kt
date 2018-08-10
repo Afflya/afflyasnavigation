@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
+import androidx.appcompat.app.AppCompatDelegate
 import com.afflyas.afflyasnavigation.ANBottomNavigation
 import com.afflyas.afflyasnavigation.ANBottomNavigationItem
 import com.google.android.material.snackbar.Snackbar
@@ -13,6 +14,16 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
+
+    /**
+     * Fix crashes caused by using vector drawables on Android 4.*
+     */
+    init {
+        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+            AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
+        }
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

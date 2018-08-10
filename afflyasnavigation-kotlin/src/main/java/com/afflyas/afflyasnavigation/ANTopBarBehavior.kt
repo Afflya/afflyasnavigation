@@ -4,14 +4,12 @@ import android.animation.ObjectAnimator
 import android.content.Context
 import android.os.Build
 import android.util.AttributeSet
-import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 
 class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
@@ -50,7 +48,6 @@ class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
 
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
-        //Log.d("myDev", "onNestedScroll dyConsumed = " + dyConsumed)
         if (dyConsumed < -scrollingDeadZone) {
             handleDirection(child, SCROLL_DIRECTION_DOWN)
         } else if (dyConsumed > scrollingDeadZone) {

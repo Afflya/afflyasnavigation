@@ -2,14 +2,12 @@ package com.afflyas.afflyasnavigation
 
 import android.animation.ObjectAnimator
 import android.os.Build
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
-import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 import com.google.android.material.snackbar.Snackbar
 

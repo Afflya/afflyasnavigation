@@ -7,6 +7,12 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 
+/**
+ *
+ * FrameLayout that adds left and right padding
+ * based on the presence of a display cutout and translucent navigation bar
+ *
+ */
 class ANVerticalContentContainer : FrameLayout {
 
     private var translucentNavigationThemeEnabled: Boolean = false

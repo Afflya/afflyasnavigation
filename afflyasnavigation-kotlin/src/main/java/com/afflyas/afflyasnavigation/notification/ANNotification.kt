@@ -6,11 +6,9 @@ import android.text.TextUtils
 import androidx.annotation.ColorInt
 import java.util.ArrayList
 
-class ANNotification : Parcelable {
+class ANNotification: Parcelable {
 
-    constructor() {
-        // empty
-    }
+    constructor()
 
     var text: String? = null
         private set // can be null, so notification will not be shown

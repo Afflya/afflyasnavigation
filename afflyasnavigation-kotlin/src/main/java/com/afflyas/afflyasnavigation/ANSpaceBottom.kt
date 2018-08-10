@@ -7,6 +7,12 @@ import android.util.AttributeSet
 import android.widget.FrameLayout
 import androidx.annotation.RequiresApi
 
+/**
+ *
+ * Layout that used to fill bottom space
+ * based on the presence of a display cutout and translucent navigation bar
+ *
+ */
 class ANSpaceBottom : FrameLayout{
 
     private var translucentNavigationThemeEnabled: Boolean = false
