@@ -2,9 +2,7 @@ package com.afflyas.afflyasnavigation
 
 import android.animation.ArgbEvaluator
 import android.animation.ValueAnimator
-import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.graphics.PorterDuff
 import android.graphics.drawable.Drawable
 import android.os.Build
@@ -249,55 +247,4 @@ object ANHelper {
         animator.start()
     }
 
-    /**
-     * Check if the status bar is translucent
-     *
-     * @param context Context
-     * @return
-     */
-    fun isTranslucentStatusBar(context: Context): Boolean {
-        val w = unwrap(context).window
-        val lp = w.attributes
-        val flags = lp.flags
-
-        return Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT &&
-                (flags and WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION) == WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION
-    }
-
-    /**
-     * Get the height of the buttons bar
-     *
-     * @param context Context
-     * @return
-     */
-    fun getSoftButtonsBarSizePort(context: Context): Int {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-            val metrics = DisplayMetrics()
-            val window = unwrap(context).window
-            window.windowManager.defaultDisplay.getMetrics(metrics)
-            val usableHeight = metrics.heightPixels
-            window.windowManager.defaultDisplay.getRealMetrics(metrics)
-            val realHeight = metrics.heightPixels
-            return if (realHeight > usableHeight)
-                realHeight - usableHeight
-            else
-                0
-        }
-        return 0
-    }
-
-    /**
-     * Unwrap wactivity
-     *
-     * @param context Context
-     * @return Activity
-     */
-    fun unwrap(context: Context): Activity {
-        var mContext = context
-        while (mContext !is Activity) {
-            val wrapper = mContext as ContextWrapper
-            mContext = wrapper.baseContext
-        }
-        return mContext
-    }
 }

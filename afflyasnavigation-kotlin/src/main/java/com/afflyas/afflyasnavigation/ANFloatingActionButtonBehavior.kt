@@ -79,6 +79,9 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
     override fun layoutDependsOn(parent: CoordinatorLayout, child: V, dependency: View): Boolean {
         if(behaviorTranslationInitialized){
 
+            /**
+             * set init FAB position for Pre LOLLIPOP devices
+             */
             if(initFABPosition == 0f && child.y != 0f){
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
                     initFABPosition = child.y - bottomNavigationHeight
@@ -148,25 +151,50 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
                 val snackPosOffset = initSnackBarPosition - currentSnackBarPosition
                 val navPosOffset = initNavigationPosition - currentNavigationPosition
 
-                if(insetBottom > 0){
-                    if (currentNavigationPosition > translucentBarY) {
+
+                if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+                    if (currentSnackBarPosition < currentNavigationPosition) {
                         /**
-                         * Bottom navigation below android navigation bar
+                         * Snack above bottom navigation
                          */
-                        if (currentSnackBarPosition > translucentBarY) {
+                        child.y = initFABPosition + bottomNavigationHeight + bottomNavigationHeight - snackPosOffset
+                    }
+                }else{
+                    if(insetBottom > 0){
+                        if (currentNavigationPosition > translucentBarY) {
                             /**
-                             * Snack below android navigation bar
+                             * Bottom navigation below android navigation bar
                              */
-                            child.y = initFABPosition + bottomNavigationHeight
-                        }else{
+                            if (currentSnackBarPosition > translucentBarY) {
+                                /**
+                                 * Snack below android navigation bar
+                                 */
+                                child.y = initFABPosition + bottomNavigationHeight
+                            }else{
+                                /**
+                                 * Snack above android navigation bar
+                                 */
+                                child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                            }
+                        } else {
                             /**
-                             * Snack above android navigation bar
+                             * Bottom navigation above android navigation bar
                              */
-                            child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                            if (currentSnackBarPosition > currentNavigationPosition) {
+                                /**
+                                 * Snack below bottom navigation
+                                 */
+                                child.y = initFABPosition - navPosOffset
+                            }else{
+                                /**
+                                 * Snack above bottom navigation
+                                 */
+                                child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                            }
                         }
-                    } else {
+                    }else{
                         /**
-                         * Bottom navigation above android navigation bar
+                         * Translucent navigation disabled
                          */
                         if (currentSnackBarPosition > currentNavigationPosition) {
                             /**
@@ -180,11 +208,6 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
                             child.y = initFABPosition + fabMarginBottom - snackPosOffset
                         }
                     }
-                }else{
-                    /**
-                     * Translucent navigation disabled
-                     */
-                    child.y = initFABPosition + bottomNavigationHeight - snackPosOffset
                 }
             }
         }

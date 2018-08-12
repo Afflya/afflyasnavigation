@@ -23,9 +23,9 @@ abstract class VerticalScrollingBehavior<V : View> : CoordinatorLayout.Behavior<
 
     private var mTotalDyUnconsumed = 0
     private var mTotalDy = 0
-    /*
-	   @return Overscroll direction: SCROLL_DIRECTION_UP, SCROLL_DIRECTION_DOWN, SCROLL_NONE
-   */
+    /**
+     *  @return Overscroll direction: SCROLL_DIRECTION_UP, SCROLL_DIRECTION_DOWN, SCROLL_NONE
+     */
     @ScrollDirection
     @get:ScrollDirection
     var overScrollDirection = SCROLL_NONE
