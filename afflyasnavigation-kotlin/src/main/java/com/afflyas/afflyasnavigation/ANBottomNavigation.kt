@@ -68,7 +68,7 @@ class ANBottomNavigation : FrameLayout {
     private var circleRevealAnim: Animator? = null
     private var colored = false
     private var selectedBackgroundVisible = false
-    private var notifications: ArrayList<ANNotification>? = ANNotification.generateEmptyList(MAX_ITEMS)
+    private var notifications = ANNotification.generateEmptyList(MAX_ITEMS) //: ArrayList<ANNotification>? = ANNotification.generateEmptyList(MAX_ITEMS)
     private val itemsEnabledStates = arrayOf(true, true, true, true, true)
     private var currentItem = 0
     private var currentColor = 0
