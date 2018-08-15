@@ -1,9 +1,7 @@
 package com.afflyas.afflyasnavigation;
 
 
-
 import android.content.Context;
-import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -14,7 +12,6 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public abstract class VerticalScrollingBehavior<V extends View> extends CoordinatorLayout.Behavior<V> {
 
