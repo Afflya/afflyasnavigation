@@ -78,7 +78,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Snackbar.make(findViewById(R.id.coordinator), "Hello", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Ok", null)
+                        .setAction("Ok", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                
+                            }
+                        })
                         .show();
             }
         });
@@ -139,12 +144,22 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case 123:
                 Snackbar.make(findViewById(R.id.coordinator), "Done", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Undo", null)
+                        .setAction("Undo", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        })
                         .show();
                 break;
             case android.R.id.home:
                 Snackbar.make(findViewById(R.id.coordinator), "Back", Snackbar.LENGTH_SHORT)
-                        .setAction("Ok", null)
+                        .setAction("Ok", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+
+                            }
+                        })
                         .show();
                 break;
         }

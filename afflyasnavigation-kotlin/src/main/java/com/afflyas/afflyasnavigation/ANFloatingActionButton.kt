@@ -212,7 +212,7 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
     private fun setupBehaviorTranslation(){
         if (parent is CoordinatorLayout) {
             val params = layoutParams
-            if(!fabBehavior.behaviorTranslationInitialized){
+            if(!fabBehavior.isBehaviorTranslationInitialized){
                 fabBehavior.updateTranslationBehavior(
                         context,
                         insetBottom,
