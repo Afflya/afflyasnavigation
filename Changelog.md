@@ -7,7 +7,7 @@
 - New container layout that helps to avoid display cutout at the side of the screen (See ANVerticalContentContainer)
 - New layouts to help to avoid translucent status and navigation bars (See ANSpaceBottom and ANSpaceTop)
 - Added new XML attributes for all elements
-- Now you can create bottom navigation items using XML resouce
+- Now you can create bottom navigation items using XML resource
 
 ### 1.0.1
 
