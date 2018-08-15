@@ -10,7 +10,6 @@ import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
-import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 
 class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
 
@@ -49,9 +48,9 @@ class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
         if (dyConsumed < -scrollingDeadZone) {
-            handleDirection(child, SCROLL_DIRECTION_DOWN)
+            handleDirection(child, ScrollDirection.SCROLL_DIRECTION_DOWN)
         } else if (dyConsumed > scrollingDeadZone) {
-            handleDirection(child, SCROLL_DIRECTION_UP)
+            handleDirection(child, ScrollDirection.SCROLL_DIRECTION_UP)
         }
     }
 
@@ -60,10 +59,10 @@ class ANTopBarBehavior<V : View> : VerticalScrollingBehavior<V> {
     }
 
     private fun handleDirection(child: V, scrollDirection: Int) {
-        if (scrollDirection == SCROLL_DIRECTION_DOWN && hidden) {
+        if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && hidden) {
             hidden = false
             animateOffset(child, 0, false, true)
-        } else if (scrollDirection == SCROLL_DIRECTION_UP && !hidden) {
+        } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !hidden) {
             hidden = true
             animateOffset(child, -child.height, false, true)
         }

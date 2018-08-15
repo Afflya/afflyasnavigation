@@ -8,7 +8,6 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.ViewPropertyAnimatorCompat
-import com.afflyas.afflyasnavigation.VerticalScrollingBehavior.Companion.ScrollDirection
 import com.google.android.material.snackbar.Snackbar
 
 class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
@@ -85,9 +84,9 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
     override fun onNestedScroll(coordinatorLayout: CoordinatorLayout, child: V, target: View, dxConsumed: Int, dyConsumed: Int, dxUnconsumed: Int, dyUnconsumed: Int, type: Int) {
         super.onNestedScroll(coordinatorLayout, child, target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type)
         if (dyConsumed < -scrollingDeadZone) {
-            handleDirection(child, VerticalScrollingBehavior.SCROLL_DIRECTION_DOWN)
+            handleDirection(child, ScrollDirection.SCROLL_DIRECTION_DOWN)
         } else if (dyConsumed > scrollingDeadZone) {
-            handleDirection(child, VerticalScrollingBehavior.SCROLL_DIRECTION_UP)
+            handleDirection(child, ScrollDirection.SCROLL_DIRECTION_UP)
         }
     }
 
@@ -106,10 +105,10 @@ class ANBottomNavigationBehavior<V : View> : VerticalScrollingBehavior<V> {
         if (!behaviorTranslationEnabled) {
             return
         }
-        if (scrollDirection == VerticalScrollingBehavior.SCROLL_DIRECTION_DOWN && isHidden) {
+        if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_DOWN && isHidden) {
             isHidden = false
             animateOffset(child, 0, false, true)
-        } else if (scrollDirection == VerticalScrollingBehavior.SCROLL_DIRECTION_UP && !isHidden) {
+        } else if (scrollDirection == ScrollDirection.SCROLL_DIRECTION_UP && !isHidden) {
             isHidden = true
             animateOffset(child, child.height, false, true)
         }
