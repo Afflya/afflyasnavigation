@@ -37,7 +37,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         app:srcCompat="@drawable/ic_audiotrack_black_24dp"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        app:withANBottomNavigation="true"/>
 
     <com.afflyas.afflyasnavigation.ANBottomNavigation
         android:id="@+id/botNav"

@@ -6,6 +6,7 @@ import android.util.DisplayMetrics
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import com.google.android.material.snackbar.Snackbar
 
@@ -40,11 +41,14 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
     var behaviorTranslationInitialized = false
         private set
 
-    fun updateTranslationBehavior(context: Context, insetBottom: Int, layoutHeight: Int){
+    private var withBottomNavigation: Boolean = false
+
+    fun updateTranslationBehavior(context: Context, insetBottom: Int, layoutHeight: Int, withBottomNavigation: Boolean){
 
         this.insetBottom = insetBottom
 
-        bottomNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
+        if(withBottomNavigation) bottomNavigationHeight = context.resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
+        this.withBottomNavigation = withBottomNavigation
 
         val display = (context.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
         val displayMetrics = DisplayMetrics()
@@ -153,17 +157,65 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
 
 
                 if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
-                    if (currentSnackBarPosition < currentNavigationPosition) {
+                    if(withBottomNavigation){
                         /**
-                         * Snack above bottom navigation
+                         * Has Bottom Navigation
                          */
-                        child.y = initFABPosition + bottomNavigationHeight + bottomNavigationHeight - snackPosOffset
+                        if (currentSnackBarPosition < currentNavigationPosition) {
+                            /**
+                             * Snack above bottom navigation
+                             */
+                            child.y = initFABPosition + bottomNavigationHeight + bottomNavigationHeight - snackPosOffset
+                        }
+                    }else{
+                        /**
+                         * No Bottom Navigation
+                         */
+                        child.y = initFABPosition - snackPosOffset
                     }
                 }else{
                     if(insetBottom > 0){
-                        if (currentNavigationPosition > translucentBarY) {
+                        /**
+                         * Translucent navigation enabled
+                         */
+                        if(withBottomNavigation){
                             /**
-                             * Bottom navigation below android navigation bar
+                             * Has Bottom Navigation
+                             */
+                            if (currentNavigationPosition > translucentBarY) {
+                                /**
+                                 * Bottom navigation below android navigation bar
+                                 */
+                                if (currentSnackBarPosition > translucentBarY) {
+                                    /**
+                                     * Snack below android navigation bar
+                                     */
+                                    child.y = initFABPosition + bottomNavigationHeight
+                                }else{
+                                    /**
+                                     * Snack above android navigation bar
+                                     */
+                                    child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                                }
+                            } else {
+                                /**
+                                 * Bottom navigation above android navigation bar
+                                 */
+                                if (currentSnackBarPosition > currentNavigationPosition) {
+                                    /**
+                                     * Snack below bottom navigation
+                                     */
+                                    child.y = initFABPosition - navPosOffset
+                                }else{
+                                    /**
+                                     * Snack above bottom navigation
+                                     */
+                                    child.y = initFABPosition + fabMarginBottom - snackPosOffset
+                                }
+                            }
+                        }else{
+                            /**
+                             * No Bottom Navigation
                              */
                             if (currentSnackBarPosition > translucentBarY) {
                                 /**
@@ -176,9 +228,14 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
                                  */
                                 child.y = initFABPosition + fabMarginBottom - snackPosOffset
                             }
-                        } else {
+                        }
+                    }else{
+                        /**
+                         * Translucent navigation disabled
+                         */
+                        if(withBottomNavigation){
                             /**
-                             * Bottom navigation above android navigation bar
+                             * Has Bottom Navigation
                              */
                             if (currentSnackBarPosition > currentNavigationPosition) {
                                 /**
@@ -191,19 +248,9 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
                                  */
                                 child.y = initFABPosition + fabMarginBottom - snackPosOffset
                             }
-                        }
-                    }else{
-                        /**
-                         * Translucent navigation disabled
-                         */
-                        if (currentSnackBarPosition > currentNavigationPosition) {
-                            /**
-                             * Snack below bottom navigation
-                             */
-                            child.y = initFABPosition - navPosOffset
                         }else{
                             /**
-                             * Snack above bottom navigation
+                             * No Bottom Navigation
                              */
                             child.y = initFABPosition + fabMarginBottom - snackPosOffset
                         }
@@ -213,11 +260,21 @@ class ANFloatingActionButtonBehavior<V : View> : CoordinatorLayout.Behavior<V>()
         }
     }
 
+
     /**
      * set FAB position when Snack disappears
      */
     override fun onDependentViewRemoved(parent: CoordinatorLayout, child: V, dependency: View) {
         if(behaviorTranslationInitialized && dependency is Snackbar.SnackbarLayout) {
+
+            /**
+             * Handle if there no bottom navigation
+             */
+            if(!withBottomNavigation){
+                child.y = initFABPosition
+                return
+            }
+
             currentSnackBarPosition = 0f
             val navPosOffset = initNavigationPosition - currentNavigationPosition
             if (insetBottom > 0) {

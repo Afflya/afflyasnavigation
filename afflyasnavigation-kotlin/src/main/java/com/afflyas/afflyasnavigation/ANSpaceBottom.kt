@@ -17,7 +17,10 @@ class ANSpaceBottom : FrameLayout{
 
     private var translucentNavigationThemeEnabled: Boolean = false
 
-    var withANBottomNavigation = true
+    /**
+     * Add space to avoid bottom navigation
+     */
+    var withANBottomNavigation = false
         private set
 
     /**
@@ -54,7 +57,7 @@ class ANSpaceBottom : FrameLayout{
         if (attrs != null) {
             val ta = context.obtainStyledAttributes(attrs, R.styleable.ANSpaceBottom, 0, 0)
             try {
-                withANBottomNavigation = ta.getBoolean(R.styleable.ANSpaceBottom_withANBottomNavigation, true)
+                withANBottomNavigation = ta.getBoolean(R.styleable.ANSpaceBottom_withANBottomNavigation, false)
             } finally {
                 ta.recycle()
             }

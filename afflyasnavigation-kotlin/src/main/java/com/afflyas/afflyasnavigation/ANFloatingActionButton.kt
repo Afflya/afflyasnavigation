@@ -23,6 +23,13 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
 
     private var translucentNavigationThemeEnabled: Boolean = false
 
+
+    /**
+     * Add space to avoid bottom navigation
+     */
+    var withANBottomNavigation = false
+        private set
+
     /**
      * system window insets
      */
@@ -40,14 +47,37 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
      */
     private var layoutHeight: Int = 0
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(context, attrs)
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr)
+    constructor(context: Context) : super(context){
+        init(context, null)
+    }
 
-    init {
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+    constructor(context: Context, attrs: AttributeSet?) : super(context, attrs) {
+        init(context, attrs)
+    }
+
+    constructor(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : super(context, attrs, defStyleAttr){
+        init(context, attrs)
+    }
+
+    /**
+     * Init
+     *
+     * @param context
+     */
+    private fun init(context: Context, attrs: AttributeSet?) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             translucentNavigationThemeEnabled = ANHelper.isTranslucentNavigationThemeEnabled(context)
         }
+
+        if (attrs != null) {
+            val ta = context.obtainStyledAttributes(attrs, R.styleable.ANFloatingActionButton, 0, 0)
+            try {
+                withANBottomNavigation = ta.getBoolean(R.styleable.ANFloatingActionButton_withANBottomNavigation, false)
+            } finally {
+                ta.recycle()
+            }
+        }
+
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -186,7 +216,8 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
                 fabBehavior.updateTranslationBehavior(
                         context,
                         insetBottom,
-                        layoutHeight)
+                        layoutHeight,
+                        withANBottomNavigation)
                 (params as CoordinatorLayout.LayoutParams).behavior = fabBehavior
             }
         }
@@ -222,7 +253,10 @@ class ANFloatingActionButton : FloatingActionButton, CoordinatorLayout.AttachedB
 //                //TODO: Handle Gravity.TOP
 //            }
             Gravity.BOTTOM -> {
-                fabBottomMargin = insetBottom + resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
+                fabBottomMargin = insetBottom
+                if(withANBottomNavigation){
+                    fabBottomMargin =+ resources.getDimensionPixelOffset(R.dimen.bottom_navigation_height)
+                }
             }
         }
 

@@ -2,6 +2,7 @@
 <resources>
     <attr name="behaviorTranslationEnabled" format="boolean" />
     <attr name="scrollingDeadZone" format="integer" />
+    <attr name="withANBottomNavigation" format="boolean" />
 
     <declare-styleable name="ANTopBar">
         <attr name="behaviorTranslationEnabled" />
@@ -9,7 +10,11 @@
     </declare-styleable>
 
     <declare-styleable name="ANSpaceBottom">
-        <attr name="withANBottomNavigation" format="boolean" />
+        <attr name="withANBottomNavigation"/>
+    </declare-styleable>
+
+    <declare-styleable name="ANFloatingActionButton">
+        <attr name="withANBottomNavigation"/>
     </declare-styleable>
 
     <declare-styleable name="ANSpaceTop">
