@@ -8,20 +8,22 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 
 <img src="include/Sample-1.gif" width="208" height="368" /> <img src="include/Sample-2.gif" width="208" height="368" /> <img src="include/Sample-3.gif" width="208" height="368" /> <img src="include/Sample-4.gif" width="208" height="368" /> 
 
-## What's new in 1.0.1 ([Changelog](https://github.com/Afflya/afflyasnavigation/blob/master/Changelog.md))
+## What's new in 1.1.0 ([Changelog](https://github.com/Afflya/afflyasnavigation/blob/master/Changelog.md))
 
-* Updated libraries versions
-* Optimized screen bounds calculation algorithm
-
-[Check out](https://github.com/Afflya/afflyasnavigation/tree/api28-preview) Android P version of the library with display cutout support
+* Migrated to SDK 28 and AndroidX libraries
+* Added display cutout support for devices running android P
+* New container layout that helps to avoid display cutout at the side of the screen (ANVerticalContentContainer)
+* New layouts to help to avoid translucent status and navigation bars (ANSpaceBottom and ANSpaceTop)
+* Added new XML attributes for all elements
+* Now you can create bottom navigation items using XML resouce
 
 ## Configuration
 
-- compileSdkVersion=27
+- compileSdkVersion=28
 - minSdkVersion=14
-- targetSdkVersion=27
-- supportVersion=27.1.1
-- kotlinVersion=1.2.41
+- targetSdkVersion=28
+- androidXVersion=1.0.0-rc01
+- kotlinVersion=1.2.60
 
 ## Components
 
@@ -48,6 +50,14 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 * Always above translucent navigation bar
 * Adapted to side translucent navigation in landscape orientation
 
+### ANVerticalContentContainer
+
+* Container to your content that helps to avoid translucent navigation bar and display cutout on the side of the screen
+
+### ANSpaceTop and ANSpaceBottom
+
+* Space on top and bottom of your scrolling content avoid translucent navigation bar, status bar and display cutout
+
 ## Getting started
 
 ### Installation
@@ -55,7 +65,7 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 Add the following line to your `build.gradle`'s dependencies section:
 
 ```groovy
-implementation 'com.github.afflya:afflyasnavigation-kotlin:1.0.1'
+implementation 'com.github.afflya:afflyasnavigation-kotlin:1.1.0'
 ```
 
 * The library is completely written in [Kotlin](https://kotlinlang.org) but will work if you use java
@@ -66,20 +76,20 @@ implementation 'com.github.afflya:afflyasnavigation-kotlin:1.0.1'
 
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/coordinator"
+<androidx.coordinatorlayout.widget.CoordinatorLayout android:id="@+id/coordinator"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.afflyas.sample.MainActivity">
+    tools:context="com.afflyas.sample.MainActivity"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
 
     <com.afflyas.afflyasnavigation.ANTopBar
-        android:id="@+id/appBar"
+        android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
-        app:tbBehaviorTranslationEnabled="true"
+        app:behaviorTranslationEnabled="true"
         android:background="@color/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay">
                 
@@ -93,20 +103,58 @@ implementation 'com.github.afflya:afflyasnavigation-kotlin:1.0.1'
     </com.afflyas.afflyasnavigation.ANTopBar>
 
     <com.afflyas.afflyasnavigation.ANFloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/floating_action_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         app:srcCompat="@drawable/ic_audiotrack_black_24dp"
-        app:useCompatPadding="true" />
+        app:useCompatPadding="true"
+        app:withANBottomNavigation="true"/>
 
     <com.afflyas.afflyasnavigation.ANBottomNavigation
-        android:id="@+id/bottomNavigation"
+        android:id="@+id/botNav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:behaviorTranslationEnabled="true"
+        app:colored="true"
+        app:titleState="always_show"
+        app:itemsMenu="@xml/bot_nav_menu"
         android:layout_gravity="bottom"/>
 
-    <!--Other content-->
+    <!--Layout to avoid translucent navigation bar and display cutout on the sides-->
+    <com.afflyas.afflyasnavigation.ANVerticalContentContainer
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <androidx.core.widget.NestedScrollView
+            android:id="@+id/nestedScrollView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!--Space before content to avoid status bar and display cutout-->
+                <com.afflyas.afflyasnavigation.ANSpaceTop
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:topBarHeightMode="default_action_bar"/>
+
+                <!--Place your content here-->
+                
+                <!--Space after the content to avoid navigation and display cutout-->
+                <com.afflyas.afflyasnavigation.ANSpaceBottom
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:withANBottomNavigation="true"/>
+
+            </LinearLayout>
+
+        </androidx.core.widget.NestedScrollView>
+
+    </com.afflyas.afflyasnavigation.ANVerticalContentContainer>
 
 </android.support.design.widget.CoordinatorLayout>
 ```
@@ -191,6 +239,37 @@ bottomNavigation.setOnTabSelectedListener(object : ANBottomNavigation.OnTabSelec
         })
 ```
 
+#### Items using xml menu
+
+* Create resource file in `res/xml` like this
+
+```xml
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:title="@string/home"
+        android:icon="@drawable/ic_home_black_24dp"
+        android:color="@color/colorPrimary"/>
+    <item
+        android:title="@string/chat"
+        android:icon="@drawable/ic_chat_black_24dp"
+        android:color="@color/colorAccent"/>
+    <item
+        android:title="@string/dashboard"
+        android:icon="@drawable/ic_dashboard_black_24dp"
+        android:color="@color/colorPrimaryDark"/>
+    <item
+        android:title="@string/music"
+        android:icon="@drawable/ic_audiotrack_black_24dp"
+        android:color="@android:color/holo_red_light"/>
+    <item
+        android:title="@string/settings"
+        android:icon="@drawable/ic_settings_black_24dp"
+        android:color="@android:color/holo_green_light"/>
+</menu>
+```
+
+* Add `app:itemsMenu="@xml/bot_nav_menu"` attribute with the path to the file to your `ANBottomNavigation`
+
 #### Translucent navigation
 
 The elements automatically adapt to transparent bars, you just need to include these lines in your application's theme
@@ -204,12 +283,6 @@ The elements automatically adapt to transparent bars, you just need to include t
 ```
 
 * Add these lines to ``styles-v21`` if your minSdkVersion<21
-
-## Current tasks
-
-* Upgrade ANFloatingActionButton translation behavior for Gravity.TOP (move FAB to top) and Gravity.CENTER_VERTICAL (do not move)
-* Add bottom translation for large screens (when little snackbar appears in the middle)
-* Add content container component
 
 ## License
 
