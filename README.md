@@ -15,7 +15,7 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 * New container layout that helps to avoid display cutout at the side of the screen (ANVerticalContentContainer)
 * New layouts to help to avoid translucent status and navigation bars (ANSpaceBottom and ANSpaceTop)
 * Added new XML attributes for all elements
-* Now you can create bottom navigation items using XML resouce
+* Now you can create bottom navigation items using XML resource
 
 ## Configuration
 
