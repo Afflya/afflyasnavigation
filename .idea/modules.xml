@@ -3,7 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/afflyasnavigation.iml" filepath="$PROJECT_DIR$/afflyasnavigation.iml" />
-      <module fileurl="file://$PROJECT_DIR$/afflyasnavigation-kotlin/afflyasnavigation-kotlin.iml" filepath="$PROJECT_DIR$/afflyasnavigation-kotlin/afflyasnavigation-kotlin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/afflyasnavigation/afflyasnavigation-afflyasnavigation.iml" filepath="$PROJECT_DIR$/afflyasnavigation/afflyasnavigation-afflyasnavigation.iml" />
       <module fileurl="file://$PROJECT_DIR$/sample/sample.iml" filepath="$PROJECT_DIR$/sample/sample.iml" />
     </modules>
   </component>

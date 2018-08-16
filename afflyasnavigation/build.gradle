@@ -1,21 +1,19 @@
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'org.jetbrains.dokka-android'
 
 ext {
     bintrayRepo = 'afflyasnavigation'
-    bintrayName = 'afflyasnavigation-kotlin'
+    bintrayName = 'afflyasnavigation'
 
     publishedGroupId = 'com.github.afflya'
     libraryName = 'AfflyasNavigation'
-    artifact = 'afflyasnavigation-kotlin'
+    artifact = 'afflyasnavigation'
 
-    libraryDescription = 'Kotlin Android library for implementing the behavior of navigation elements upon content scrolling'
+    libraryDescription = 'Java Android library for implementing the behavior of navigation elements upon content scrolling'
 
     siteUrl = 'https://github.com/Afflya/afflyasnavigation'
     gitUrl = 'https://github.com/Afflya/afflyasnavigation.git'
 
-    libraryVersion = '1.1.0'
+    libraryVersion = '1.2.0'
 
     developerId = 'afflya'
     developerName = 'Andrey Poznyakov'
@@ -32,8 +30,8 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion 28
-        versionCode 3
-        versionName "1.1.0"
+        versionCode 4
+        versionName "1.2.0"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -48,15 +46,10 @@ android {
 
 dependencies {
     implementation 'com.google.android.material:material:1.0.0-rc01'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.2.60"
-}
-
-dokka {
-    outputFormat = 'html'
-    outputDirectory = "$buildDir/javadoc"
 }
 
 // Place it at the end of the file
-apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
-apply from: 'bintrayv1.gradle'
+if (project.rootProject.file('local.properties').exists()) {
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+    apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
+}
