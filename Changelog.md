@@ -1,6 +1,10 @@
 # Changelog
 
-### 1.1.0 (latest stable)
+### 1.2.0 (latest stable [java]) 
+
+* Implementation of the library v1.1.0 in java
+
+### 1.1.0 (latest stable [kotlin]) 
 
 - Migrated to SDK 28 and AndroidX libraries
 - Added display cutout support for devices running android P

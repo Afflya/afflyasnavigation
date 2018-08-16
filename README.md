@@ -1,4 +1,4 @@
-[ ![Version](https://api.bintray.com/packages/afflya/afflyasnavigation/afflyasnavigation-kotlin/images/download.svg) ](https://bintray.com/afflya/afflyasnavigation/afflyasnavigation-kotlin/_latestVersion)
+[ ![Download](https://api.bintray.com/packages/afflya/afflyasnavigation/afflyasnavigation/images/download.svg) ](https://bintray.com/afflya/afflyasnavigation/afflyasnavigation/_latestVersion)
 
 # AfflyasNavigation
 
@@ -8,7 +8,7 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 
 <img src="include/Sample-1.gif" width="208" height="368" /> <img src="include/Sample-2.gif" width="208" height="368" /> <img src="include/Sample-3.gif" width="208" height="368" /> <img src="include/Sample-4.gif" width="208" height="368" /> 
 
-## What's new in 1.1.0 ([Changelog](https://github.com/Afflya/afflyasnavigation/blob/master/Changelog.md))
+## What's new in 1.1.0 / 1.2.0 ([Changelog](https://github.com/Afflya/afflyasnavigation/blob/master/Changelog.md))
 
 * Migrated to SDK 28 and AndroidX libraries
 * Added display cutout support for devices running android P
@@ -23,7 +23,6 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 - minSdkVersion=14
 - targetSdkVersion=28
 - androidXVersion=1.0.0-rc01
-- kotlinVersion=1.2.60
 
 ## Components
 
@@ -65,10 +64,11 @@ AfflyasNavigation is an Android library for implementing the behavior of navigat
 Add the following line to your `build.gradle`'s dependencies section:
 
 ```groovy
+//For Java version
+implementation 'com.github.afflya:afflyasnavigation:1.2.0'
+//For Kotlin version
 implementation 'com.github.afflya:afflyasnavigation-kotlin:1.1.0'
 ```
-
-* The library is completely written in [Kotlin](https://kotlinlang.org) but will work if you use java
 
 ### Usage
 
@@ -82,7 +82,7 @@ implementation 'com.github.afflya:afflyasnavigation-kotlin:1.1.0'
     tools:context="com.afflyas.sample.MainActivity"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.afflyas.afflyasnavigation.ANTopBar
         android:id="@+id/app_bar"
@@ -92,7 +92,7 @@ implementation 'com.github.afflya:afflyasnavigation-kotlin:1.1.0'
         app:behaviorTranslationEnabled="true"
         android:background="@color/colorPrimary"
         android:theme="@style/AppTheme.AppBarOverlay">
-                
+        
         <!--Add content to your top bar here. For example, add a toolbar-->
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar"
@@ -161,20 +161,20 @@ implementation 'com.github.afflya:afflyasnavigation-kotlin:1.1.0'
 
 #### Bottom navigation bar
 
-```kotlin
+```java
 // Create items
-val item1 = ANBottomNavigationItem(R.string.home, R.drawable.ic_home, R.color.colorPrimary)
-val item2 = ANBottomNavigationItem(R.string.chat, R.drawable.ic_chat, R.color.colorAccent)
-val item3 = ANBottomNavigationItem(R.string.dashboard, R.drawable.ic_dashboard, R.color.colorPrimaryDark)
-val item4 = ANBottomNavigationItem(R.string.music, R.drawable.ic_audiotrack, android.R.color.holo_red_light)
-val item5 = ANBottomNavigationItem(R.string.settings, R.drawable.ic_settings, android.R.color.holo_green_light)
+ANBottomNavigationItem item1 = new ANBottomNavigationItem(R.string.home, R.drawable.ic_home, R.color.colorPrimary);
+ANBottomNavigationItem item2 = new ANBottomNavigationItem(R.string.chat, R.drawable.ic_chat, R.color.colorAccent);
+ANBottomNavigationItem item3 = new ANBottomNavigationItem(R.string.dashboard, R.drawable.ic_dashboard, R.color.colorPrimaryDark);
+ANBottomNavigationItem item4 = new ANBottomNavigationItem(R.string.music, R.drawable.ic_audiotrack, android.R.color.holo_red_light);
+ANBottomNavigationItem item5 = new ANBottomNavigationItem(R.string.settings, R.drawable.ic_settings, android.R.color.holo_green_light);
 
 // Add items
-bottomNavigation.addItem(item1)
-bottomNavigation.addItem(item2)
-bottomNavigation.addItem(item3)
-bottomNavigation.addItem(item4)
-bottomNavigation.addItem(item5)
+bottomNavigation.addItem(item1);
+bottomNavigation.addItem(item2);
+bottomNavigation.addItem(item3);
+bottomNavigation.addItem(item4);
+bottomNavigation.addItem(item5);
 
 // Set background color
 bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#FEFEFE"));
@@ -206,12 +206,12 @@ bottomNavigation.setNotificationBackgroundColor(Color.parseColor("#F63D2B"));
 // Add notification for each item
 bottomNavigation.setNotification("1", 3);
 // OR
-val notification = ANNotification.Builder()
+ANNotification notification = new ANNotification.Builder()
 	.setText("1")
 	.setBackgroundColor(ContextCompat.getColor(this, R.color.color_notification_back))
 	.setTextColor(ContextCompat.getColor(this, R.color.color_notification_text))
-	.build()
-bottomNavigation.setNotification(notification, 1)
+	.build();
+bottomNavigation.setNotification(notification, 1);
 
 // Remove notification for each item
 bottomNavigation.setNotification("", 3);
@@ -222,21 +222,22 @@ bottomNavigation.disableItemAtPosition(2);
 bottomNavigation.setItemDisableColor(Color.parseColor("#3A000000"));
 
 // Set listener
-bottomNavigation.setOnTabSelectedListener(object : ANBottomNavigation.OnTabSelectedListener {
-            override fun onTabSelected(position: Int, wasSelected: Boolean): Boolean {
-                when(position){
-                    1 -> {
-                        bottomNavigation.setNotification("", 1)
-                        bottomNavigation.setNotification(" ", 2)
-                    }
-                    2 -> {
-                        bottomNavigation.setNotification("22", 1)
-                        bottomNavigation.setNotification("", 2)
-                    }
+bottomNavigation.setOnTabSelectedListener(new ANBottomNavigation.OnTabSelectedListener() {
+            @Override
+            public boolean onTabSelected(int position, boolean wasSelected) {
+                switch (position){
+                    case 1:
+                        bottomNavigation.setNotification("", 1);
+                        bottomNavigation.setNotification(" ", 2);
+                        break;
+                    case 2:
+                        bottomNavigation.setNotification("22", 1);
+                        bottomNavigation.setNotification("", 2);
+                        break;
                 }
-                return true
+                return true;
             }
-        })
+        });
 ```
 
 #### Items using xml menu
